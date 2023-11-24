@@ -65,6 +65,9 @@ public class SetupManager {
     void showFpsGraph(boolean is) {
         showFpsGraph = is;
     }
+    GSetups getSetup() {
+        return setup;
+    }
     public static class Debug {
 
         public static void fpsGraph() {

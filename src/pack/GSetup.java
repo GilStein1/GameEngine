@@ -20,7 +20,10 @@ public abstract class GSetup implements GSetups{
     private JFrame frame;
     private SetupManager manager;
     private JPanel panel;
-    private java.util.List<GButton> buttons = new java.util.ArrayList<>();
+    private java.util.List<GPanel> panels = new java.util.ArrayList<>();
+    private java.util.List<GFrameButton> buttons = new java.util.ArrayList<>();
+    private java.util.List<GButton> gButtons = new java.util.ArrayList<>();
+    private java.util.List<GTextField> gTextFields = new java.util.ArrayList<>();
     public Thread executed;
     public BufferedImage img;
     public Graphics2D graphics;
@@ -41,6 +44,8 @@ public abstract class GSetup implements GSetups{
     private double[] fpsArr;
     private boolean leftMouseClicked = false;
     private boolean rightMouseClicked = false;
+    private int xScreen = 0;
+    private int yScreen = 0;
 
     public GSetup() {
 
@@ -59,10 +64,14 @@ public abstract class GSetup implements GSetups{
                 if(keyTyped != null) {
                     keyTyped.action(e);
                 }
+                for(GTextField t : gTextFields) {
+                    t.typed(e,lastKeyPressed == KeyEvent.VK_BACK_SPACE);
+                }
             }
 
             @Override
             public void keyPressed(KeyEvent e) {
+//                System.out.println(e.getKeyCode());
                 lastKeyPressed = e.getKeyCode();
                 if(keyPressed != null) {
                     keyPressed.action(e);
@@ -141,6 +150,8 @@ public abstract class GSetup implements GSetups{
                     lastTime = currentTime;
                     currentTime = System.currentTimeMillis();
 
+                    xScreen = (int)MouseInfo.getPointerInfo().getLocation().getX() - 8;
+                    yScreen = (int)MouseInfo.getPointerInfo().getLocation().getY() - 31;
                     execute();
                 }
 
@@ -154,6 +165,9 @@ public abstract class GSetup implements GSetups{
                     isPainting = true;
                     if(img != null) {
                         g.drawImage(img,0,0,frame.getWidth(),frame.getHeight(),null);
+                    }
+                    for(GPanel p : panels) {
+                        p.refresh();
                     }
                     isPainting = false;
                 }
@@ -191,6 +205,12 @@ public abstract class GSetup implements GSetups{
             public void mousePressed(MouseEvent e) {
                 if(e.getButton() == 1) {
                     leftMouseClicked = true;
+                    for(GButton b : gButtons) {
+                        b.setPressed(true);
+                    }
+                    for(GTextField t : gTextFields) {
+                        t.setPressed(true);
+                    }
                 }
                 if(e.getButton() == 3) {
                     rightMouseClicked = true;
@@ -201,6 +221,12 @@ public abstract class GSetup implements GSetups{
             public void mouseReleased(MouseEvent e) {
                 if(e.getButton() == 1) {
                     leftMouseClicked = false;
+                    for(GButton b : gButtons) {
+                        b.setPressed(false);
+                    }
+                    for(GTextField t : gTextFields) {
+                        t.setPressed(false);
+                    }
                 }
                 if(e.getButton() == 3) {
                     rightMouseClicked = false;
@@ -363,13 +389,29 @@ public abstract class GSetup implements GSetups{
             throw new RuntimeException(e);
         }
     }
+    public void drawButton(GButton button) {
+        button.draw(graphics,xOnCanvas(),yOnCanvas());
+    }
+    public void drawTextField(GTextField textField) {
+        textField.draw(graphics);
+    }
     /**
      *פעולה המאפשרת הוספת כפתור למסך
      * @param     button הכפתור אותו רוצים להוסיף
      */
-    public void addButton(GButton button) {
+    public void addButton(GFrameButton button) {
         panel.add(button.getJButton());
         buttons.add(button);
+    }
+    public void addGButton(GButton button) {
+        gButtons.add(button);
+    }
+    public void addGTextField(GTextField textField) {
+        gTextFields.add(textField);
+    }
+    public void addGPanel(GPanel panel) {
+        panels.add(panel);
+        panel.isAdded = true;
     }
     public void setKeyPressedAction(KeyEventSupplier event) {
         keyPressed = event;
@@ -460,36 +502,43 @@ public abstract class GSetup implements GSetups{
         JColorChooser j = new JColorChooser();
         return JColorChooser.showDialog(j,"Color Picker",Color.WHITE);
     }
-    public BufferedImage getImg() {
+    BufferedImage getImg() {
         return img;
+    }
+    public GImage getGImage() {
+        return new GImage(img);
     }
     /**
      * @return  את המקום על הציר האופקי של העכבר ביחס למסך (ולא ביחס לחלון)
      */
     public int xOnScreen() {
-        this.mousePos = MouseInfo.getPointerInfo().getLocation();
-        return (int)this.mousePos.getX();
+//        this.mousePos = MouseInfo.getPointerInfo().getLocation();
+//        return (int)this.mousePos.getX();
+        return xScreen;
     }
     /**
      * @return  את המקום על הציר האנכי של העכבר ביחס למסך (ולא ביחס לחלון)
      */
     public int yOnScreen() {
-        this.mousePos = MouseInfo.getPointerInfo().getLocation();
-        return (int)this.mousePos.getY();
+//        this.mousePos = MouseInfo.getPointerInfo().getLocation();
+//        return (int)this.mousePos.getY();
+        return yScreen;
     }
     /**
      * @return  את המיקום על הציר האופקי של העכבר ביחס לחלון
      */
     public int xOnCanvas() {
-        this.mousePos = MouseInfo.getPointerInfo().getLocation();
-        return (int)this.mousePos.getX() - frame.getX();
+//        this.mousePos = MouseInfo.getPointerInfo().getLocation();
+//        return (int)this.mousePos.getX() - frame.getX();
+        return xScreen - frame.getX();
     }
     /**
      * @return  את המיקום על הציר האנכי של העכבר ביחס לחלון
      */
     public int yOnCanvas() {
-        this.mousePos = MouseInfo.getPointerInfo().getLocation();
-        return (int)this.mousePos.getY() - frame.getY();
+//        this.mousePos = MouseInfo.getPointerInfo().getLocation();
+//        return (int)this.mousePos.getY() - frame.getY();
+        return yScreen - frame.getY();
     }
     public double[] getFpsArr() {
         return fpsArr;

@@ -21,5 +21,11 @@ public interface GSetups {
 
     double[] getFpsArr();
     double currentFPS();
+    void addGButton(GButton button);
+    void addGTextField(GTextField textField);
+    int xOnCanvas();
+    int yOnCanvas();
+    int xOnScreen();
+    int yOnScreen();
 
 }

@@ -29,6 +29,11 @@ public class GImage {
         graphics = img.createGraphics();
         graphics.drawImage(image,0,0, img.getWidth(), img.getHeight(),null);
     }
+    public GImage(GImage image) {
+        img = new BufferedImage(image.getImage().getWidth(),image.getImage().getHeight(),BufferedImage.TYPE_INT_ARGB);
+        graphics = img.createGraphics();
+        graphics.drawImage(image.getImage(),0,0, img.getWidth(), img.getHeight(),null);
+    }
     public Graphics getGraphics() {
         return graphics;
     }

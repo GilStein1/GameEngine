@@ -1,73 +1,76 @@
 package pack;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 public class GButton {
 
-    private JButton button;
-    int x,y,width,height;
-    private boolean isPressed = false;
+    private int x,y,width,height;
+    private Color c;
+    private Color c2;
+    private GImage image;
+    private GImage image2;
+    private boolean mousePressed = false;
+    private SetupManager setupManager;
 
     public GButton(int x, int y, int width, int height) {
-        button = new JButton();
-        button.setFocusable(false);
+        setupManager = SetupManager.getInstance();
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-
-        button.setBounds(x,y,width,height);
-        button.setVisible(true);
-        button.addMouseListener(new MouseListener() {
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                isPressed = true;
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                isPressed = false;
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
-        });
+        c = Color.WHITE;
+        c2 = new Color((int)(0.7*c.getRed()),(int)(0.7*c.getGreen()),(int)(0.7*c.getBlue()));
+        setupManager.getSetup().addGButton(this);
     }
-    public void setBackground(Color background) {
-        button.setBackground(background);
+    public GButton(int x, int y, int width, int height, Color color) {
+        setupManager = SetupManager.getInstance();
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        c = color;
+        c2 = new Color((int)(0.7*c.getRed()),(int)(0.7*c.getGreen()),(int)(0.7*c.getBlue()));
+        setupManager.getSetup().addGButton(this);
     }
-    public void setText(String text) {
-        button.setText(text);
+    public GButton(int x, int y, int width, int height,GImage image) {
+        setupManager = SetupManager.getInstance();
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.image = new GImage(image);
+        this.image2 = new GImage(image);
+        image2.fillRectangle(0,0,image2.getImage().getWidth(),image2.getImage().getHeight(),new Color(0,0,0,76));
+        setupManager.getSetup().addGButton(this);
     }
-    public void setFont(Font font) {
-        button.setFont(font);
-    }
-    public JButton getJButton() {
-        return button;
-    }
-    public void reset() {
-        isPressed = false;
-    }
-    public String getText() {
-        return button.getText();
+
+    void setPressed(boolean is) {
+        mousePressed = is;
     }
     public boolean isPressed() {
-        return isPressed;
+        return mousePressed && setupManager.getSetup().xOnCanvas() > this.x && setupManager.getSetup().yOnCanvas() > this.y && setupManager.getSetup().xOnCanvas() < this.x + this.width && setupManager.getSetup().yOnCanvas() < this.y + this.height;
     }
+    public GImage getGImage() {
+        return new GImage(image);
+    }
+    public void setGImage(GImage newImg) {
+        image = new GImage(newImg);
+        image2 = new GImage(newImg);
+        image2.fillRectangle(0,0,image2.getImage().getWidth(),image2.getImage().getHeight(),new Color(0,0,0,76));
+    }
+
+    void draw(Graphics g, int x, int y) {
+
+        boolean isOn = x > this.x && y > this.y && x < width + this.x && y < height + this.y;
+
+        if(c != null) {
+            g.setColor(isOn? c2 : c);
+            g.fillRect(this.x,this.y,width,height);
+        }
+        else {
+            g.drawImage((isOn? image2.getImage(): image.getImage()),this.x,this.y,width,height,null);
+        }
+
+    }
+
 }

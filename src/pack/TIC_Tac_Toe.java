@@ -4,7 +4,7 @@ import java.awt.*;
 
 public class TIC_Tac_Toe extends GSetup{
 
-    GButton[][] buttons;
+    GFrameButton[][] buttons;
     boolean[][] is;
     boolean turn = true;
     String winner = "";
@@ -12,13 +12,13 @@ public class TIC_Tac_Toe extends GSetup{
     @Override
     public void initialize() {
         setTitle("X  O");
-        setFrameIcon("איקס עיגול.png");
+        setFrameIcon("XO.png");
         setFrameSize(610,630);
         setResizable(false);
-        buttons = new GButton[3][3];
+        buttons = new GFrameButton[3][3];
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 3; j++) {
-                buttons[i][j] = new GButton(600*(i + 1)/3 - 180, 600*(j + 1)/3 - 180,160,160);
+                buttons[i][j] = new GFrameButton(600*(i + 1)/3 - 180, 600*(j + 1)/3 - 180,160,160);
                 buttons[i][j].setFont(new Font(" ",Font.BOLD,40));
                 addButton(buttons[i][j]);
             }
