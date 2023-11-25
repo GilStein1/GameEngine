@@ -140,6 +140,10 @@ public abstract class GSetup implements GSetups{
 
                 timeCountForFps += deltaTime();
 
+//                if(deltaTime() < 0) {
+//                    System.out.println("no");
+//                }
+
                 if(!isPainting) {
 
                     img = new BufferedImage(frame.getWidth(),frame.getHeight(),BufferedImage.TYPE_INT_ARGB);
@@ -171,8 +175,9 @@ public abstract class GSetup implements GSetups{
                     }
                     isPainting = false;
                 }
-
+//                System.out.println(timeCountForFps);
                 if(timeCountForFps > 0.25) {
+
                     timeCountForFps = 0;
                     for(int i = 0; i < fpsArr.length - 1; i++) {
                         fpsArr[i] = fpsArr[i + 1];
@@ -255,6 +260,8 @@ public abstract class GSetup implements GSetups{
                 if(count == 100) {
 
                     fps = (double)count/countTime;
+
+//                    System.out.println(fps);
 
                     count = 0;
                     countTime = 0.0;
@@ -496,7 +503,8 @@ public abstract class GSetup implements GSetups{
      * @return  מחזיר את הזמן שעבר מהפריים האחרון בשניות
      */
     public double deltaTime() {
-        return (currentTime - lastTime)/1000;
+        return ((currentTime - lastTime)/1000 < 1000000000 && (currentTime - lastTime)/1000 > 0)? (currentTime - lastTime)/1000 : 0;
+//        return (currentTime - lastTime)/1000;
     }
     public Color GColorPicker() {
         JColorChooser j = new JColorChooser();
