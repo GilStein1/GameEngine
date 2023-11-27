@@ -516,6 +516,12 @@ public abstract class GSetup implements GSetups{
     public GImage getGImage() {
         return new GImage(img);
     }
+    public int getFrameWidth() {
+        return frame.getWidth();
+    }
+    public int getFrameHeight() {
+        return frame.getHeight();
+    }
     /**
      * @return  את המקום על הציר האופקי של העכבר ביחס למסך (ולא ביחס לחלון)
      */
