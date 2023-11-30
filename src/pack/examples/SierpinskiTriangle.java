@@ -1,8 +1,11 @@
-package pack;
+package pack.examples;
+
+import pack.GImage;
+import pack.GSetup;
 
 import java.awt.*;
 
-public class SierpinskiTriangle extends GSetup{
+public class SierpinskiTriangle extends GSetup {
     @Override
     public void initialize() {
         setFrameSize(900,900);
@@ -35,9 +38,9 @@ public class SierpinskiTriangle extends GSetup{
     public void execute() {
         triangle(new int[]{445,100},new int[]{145,619},new int[]{745,619});
 
-        GImage gi = new GImage(getImg().getWidth(),getImg().getHeight());
-        gi.fillRectangle(0,0, getImg().getWidth(), getImg().getHeight(), Color.WHITE);
-        gi.drawImage(0,0, getImg().getWidth(), getImg().getHeight(),new GImage(getImg()));
+        GImage gi = new GImage(getBufferedImg().getWidth(), getBufferedImg().getHeight());
+        gi.fillRectangle(0,0, getBufferedImg().getWidth(), getBufferedImg().getHeight(), Color.WHITE);
+        gi.drawImage(0,0, getBufferedImg().getWidth(), getBufferedImg().getHeight(),new GImage(getBufferedImg()));
 
         setFrameIcon(gi);
     }

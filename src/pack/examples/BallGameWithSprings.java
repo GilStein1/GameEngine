@@ -1,9 +1,14 @@
-package pack;
+package pack.examples;
+
+import pack.GButton;
+import pack.GImage;
+import pack.GSetup;
+import pack.Vec2D;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class BallGameWithSprings extends GSetup{
+public class BallGameWithSprings extends GSetup {
 
     Vec2D pos;
     Vec2D v;

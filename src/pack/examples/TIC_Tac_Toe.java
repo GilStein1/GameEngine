@@ -1,8 +1,11 @@
-package pack;
+package pack.examples;
+
+import pack.GFrameButton;
+import pack.GSetup;
 
 import java.awt.*;
 
-public class TIC_Tac_Toe extends GSetup{
+public class TIC_Tac_Toe extends GSetup {
 
     GFrameButton[][] buttons;
     boolean[][] is;

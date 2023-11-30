@@ -1,10 +1,13 @@
-package pack;
+package pack.examples;
+
+import pack.GImage;
+import pack.GSetup;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
 
-public class GameOfLife extends GSetup{
+public class GameOfLife extends GSetup {
 
     boolean pressed = true;
     boolean pressed2 = true;
@@ -41,22 +44,28 @@ public class GameOfLife extends GSetup{
     public void execute() {
 
         if(leftClick()) {
-            int x = xOnCanvas() - 9;
-            int y = yOnCanvas() - 35;
-            arr1[(int)(x/9)][(int)(y/9)] = true;
+            int x = xOnCanvas();
+            int y = yOnCanvas();
+
+            if(x >= 0 && y >= 0 && x/9 < 100 && y/9 < 100) {
+                arr1[(int)(x/9)][(int)(y/9)] = true;
+            }
         }
         if(rightClick()) {
-            int x = (xOnCanvas() - 9)/9;
-            int y = (yOnCanvas() - 35)/9;
-            arr1[x][y] = false;
-            if(x > 0) {
-                arr1[x-1][y] = false;
-            }
-            if(y > 0) {
-                arr1[x][y-1] = false;
-            }
-            if(x > 0 && y > 0) {
-                arr1[x-1][y-1] = false;
+            int x = (xOnCanvas())/9;
+            int y = (yOnCanvas())/9;
+
+            if(x >= 0 && x < 100 && y > 0 && y < 100) {
+                arr1[x][y] = false;
+                if(x > 0) {
+                    arr1[x-1][y] = false;
+                }
+                if(y > 0) {
+                    arr1[x][y-1] = false;
+                }
+                if(x > 0 && y > 0) {
+                    arr1[x-1][y-1] = false;
+                }
             }
         }
 

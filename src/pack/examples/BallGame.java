@@ -1,4 +1,7 @@
-package pack;
+package pack.examples;
+
+import pack.GImage;
+import pack.GSetup;
 
 import java.awt.*;
 
@@ -60,9 +63,9 @@ public class BallGame extends GSetup {
             }
         }
 
-        GImage gi = new GImage(getImg().getWidth(),getImg().getHeight());
-        gi.fillRectangle(0,0, getImg().getWidth(), getImg().getHeight(), Color.WHITE);
-        gi.drawImage(-getImg().getWidth()/2,-getImg().getHeight()/2, 2*getImg().getWidth(), 2*getImg().getHeight(),new GImage(getImg()));
+        GImage gi = new GImage(getBufferedImg().getWidth(), getBufferedImg().getHeight());
+        gi.fillRectangle(0,0, getBufferedImg().getWidth(), getBufferedImg().getHeight(), Color.WHITE);
+        gi.drawImage(-getBufferedImg().getWidth()/2,-getBufferedImg().getHeight()/2, 2* getBufferedImg().getWidth(), 2* getBufferedImg().getHeight(),new GImage(getBufferedImg()));
 
         setFrameIcon(gi);
 

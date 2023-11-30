@@ -510,7 +510,7 @@ public abstract class GSetup implements GSetups{
         JColorChooser j = new JColorChooser();
         return JColorChooser.showDialog(j,"Color Picker",Color.WHITE);
     }
-    BufferedImage getImg() {
+    public BufferedImage getBufferedImg() {
         return img;
     }
     public GImage getGImage() {
