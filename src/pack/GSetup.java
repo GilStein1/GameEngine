@@ -170,9 +170,8 @@ public abstract class GSetup implements GSetups{
                     if(img != null) {
                         g.drawImage(img,0,0,frame.getWidth(),frame.getHeight(),null);
                     }
-                    for(GPanel p : panels) {
-                        p.refresh();
-                    }
+                    SetupManager.callTick();
+
                     isPainting = false;
                 }
 //                System.out.println(timeCountForFps);

@@ -27,5 +27,6 @@ public interface GSetups {
     int yOnCanvas();
     int xOnScreen();
     int yOnScreen();
+    double deltaTime();
 
 }

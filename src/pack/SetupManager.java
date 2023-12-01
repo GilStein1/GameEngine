@@ -2,10 +2,12 @@ package pack;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class SetupManager {
 
     private static SetupManager instance;
+    private static ArrayList<Component> tickCalls = new ArrayList<>();
     private GSetups setup;
     private JFrame fps;
     private JPanel fpsPanel;
@@ -55,6 +57,14 @@ public class SetupManager {
     public void setSetup(GSetups setup) {
         this.setup = setup;
         fpsArr = setup.getFpsArr();
+    }
+    public static void addTick(Component component) {
+        tickCalls.add(component);
+    }
+    static void callTick() {
+        for(Component c : tickCalls) {
+            c.tickUpdate();
+        }
     }
     public JFrame getFpsFrame() {
         return fps;

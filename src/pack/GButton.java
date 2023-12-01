@@ -2,37 +2,44 @@ package pack;
 
 import java.awt.*;
 
-public class GButton {
+public class GButton implements Component{
 
     private int x,y,width,height;
     private Color c;
     private Color c2;
+    private Color c3;
     private GImage image;
     private GImage image2;
+    private GImage image3;
     private boolean mousePressed = false;
     private SetupManager setupManager;
 
     public GButton(int x, int y, int width, int height) {
+        SetupManager.addTick(this);
         setupManager = SetupManager.getInstance();
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         c = Color.WHITE;
-        c2 = new Color((int)(0.7*c.getRed()),(int)(0.7*c.getGreen()),(int)(0.7*c.getBlue()));
+        c3 = new Color((int)(0.7*c.getRed()),(int)(0.7*c.getGreen()),(int)(0.7*c.getBlue()));
+        c2 = new Color((int)(0.9*c.getRed()),(int)(0.9*c.getGreen()),(int)(0.9*c.getBlue()));
         setupManager.getSetup().addGButton(this);
     }
     public GButton(int x, int y, int width, int height, Color color) {
+        SetupManager.addTick(this);
         setupManager = SetupManager.getInstance();
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         c = color;
-        c2 = new Color((int)(0.7*c.getRed()),(int)(0.7*c.getGreen()),(int)(0.7*c.getBlue()));
+        c3 = new Color((int)(0.7*c.getRed()),(int)(0.7*c.getGreen()),(int)(0.7*c.getBlue()));
+        c2 = new Color((int)(0.9*c.getRed()),(int)(0.9*c.getGreen()),(int)(0.9*c.getBlue()));
         setupManager.getSetup().addGButton(this);
     }
     public GButton(int x, int y, int width, int height,GImage image) {
+        SetupManager.addTick(this);
         setupManager = SetupManager.getInstance();
         this.x = x;
         this.y = y;
@@ -40,7 +47,9 @@ public class GButton {
         this.height = height;
         this.image = new GImage(image);
         this.image2 = new GImage(image);
-        image2.fillRectangle(0,0,image2.getImage().getWidth(),image2.getImage().getHeight(),new Color(0,0,0,76));
+        this.image3 = new GImage(image);
+        image3.fillRectangle(0,0,image2.getImage().getWidth(),image2.getImage().getHeight(),new Color(0,0,0,76));
+        image2.fillRectangle(0,0,image2.getImage().getWidth(),image2.getImage().getHeight(),new Color(0,0,0,25));
         setupManager.getSetup().addGButton(this);
     }
 
@@ -56,7 +65,16 @@ public class GButton {
     public void setGImage(GImage newImg) {
         image = new GImage(newImg);
         image2 = new GImage(newImg);
-        image2.fillRectangle(0,0,image2.getImage().getWidth(),image2.getImage().getHeight(),new Color(0,0,0,76));
+        image3 = new GImage(newImg);
+        image3.fillRectangle(0,0,image2.getImage().getWidth(),image2.getImage().getHeight(),new Color(0,0,0,76));
+        image2.fillRectangle(0,0,image2.getImage().getWidth(),image2.getImage().getHeight(),new Color(0,0,0,25));
+    }
+    public boolean isMouseHovering() {
+
+        int x = SetupManager.getInstance().getSetup().xOnCanvas();
+        int y = SetupManager.getInstance().getSetup().yOnCanvas();
+
+        return x > this.x && y > this.y && x < width + this.x && y < height + this.y;
     }
 
     void draw(Graphics g, int x, int y) {
@@ -64,13 +82,17 @@ public class GButton {
         boolean isOn = x > this.x && y > this.y && x < width + this.x && y < height + this.y;
 
         if(c != null) {
-            g.setColor(isOn? c2 : c);
+            g.setColor(isOn? (isPressed()? c3 : c2) : c);
             g.fillRect(this.x,this.y,width,height);
         }
         else {
-            g.drawImage((isOn? image2.getImage(): image.getImage()),this.x,this.y,width,height,null);
+            g.drawImage((isOn? (isPressed()? image3.getImage() : image2.getImage()): image.getImage()),this.x,this.y,width,height,null);
         }
 
     }
 
+    @Override
+    public void tickUpdate() {
+
+    }
 }
