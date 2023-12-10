@@ -28,5 +28,6 @@ public interface GSetups {
     int xOnScreen();
     int yOnScreen();
     double deltaTime();
+    void mouseClickedFromOutSide();
 
 }

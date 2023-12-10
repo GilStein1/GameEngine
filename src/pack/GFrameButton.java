@@ -25,7 +25,7 @@ public class GFrameButton {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-
+                SetupManager.getInstance().getSetup().mouseClickedFromOutSide();
             }
 
             @Override

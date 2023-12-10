@@ -9,6 +9,7 @@ public class GTextField implements Component{
     private Color background;
     private boolean mousePressed = false;
     private boolean isActive = false;
+    private boolean showFrame = true;
     private SetupManager setupManager;
     private GImage img;
     private String text = "";
@@ -37,10 +38,13 @@ public class GTextField implements Component{
         img.fillRectangle(0,0,img.getImage().getWidth(),img.getImage().getHeight(),background);
     }
 
+
     private boolean isPressed() {
         return  setupManager.getSetup().xOnCanvas() > this.x && setupManager.getSetup().yOnCanvas() > this.y && setupManager.getSetup().xOnCanvas() < this.x + this.width && setupManager.getSetup().yOnCanvas() < this.y + this.height;
     }
-
+    void turnOff() {
+        isActive = false;
+    }
     void typed(KeyEvent e,boolean del) {
 
         if(isActive) {
@@ -82,9 +86,19 @@ public class GTextField implements Component{
     }
     void draw(Graphics g) {
         g.drawImage(img.getImage(),x,y,width,height,null);
+        g.setColor(Color.BLACK);
+        if(showFrame) {
+            g.drawRect(x,y,width,height);
+        }
     }
     public String getText() {
         return text;
+    }
+    public boolean isActive() {
+        return isActive;
+    }
+    public void hideFrame(boolean hide) {
+        showFrame = !hide;
     }
 
     @Override

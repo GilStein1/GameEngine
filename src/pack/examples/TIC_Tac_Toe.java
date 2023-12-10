@@ -23,7 +23,7 @@ public class TIC_Tac_Toe extends GSetup {
             for(int j = 0; j < 3; j++) {
                 buttons[i][j] = new GFrameButton(600*(i + 1)/3 - 180, 600*(j + 1)/3 - 180,160,160);
                 buttons[i][j].setFont(new Font(" ",Font.BOLD,40));
-                addButton(buttons[i][j]);
+                addFrameButton(buttons[i][j]);
             }
         }
         is = new boolean[3][3];

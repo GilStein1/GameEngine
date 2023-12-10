@@ -96,5 +96,23 @@ public class GImage {
     public BufferedImage getImage() {
         return img;
     }
+    public int getRed(int x, int y) {
+        return (img.getRGB(x, y) >> 16) & 0xFF;
+    }
+    public int getGreen(int x, int y) {
+        return (img.getRGB(x, y) >> 8) & 0xFF;
+    }
+    public int getBlue(int x, int y) {
+        return (img.getRGB(x, y)) & 0xFF;
+    }
+    public Color getColor(int x, int y) {
+        return new Color((img.getRGB(x, y) >> 16) & 0xFF,(img.getRGB(x, y) >> 8) & 0xFF,(img.getRGB(x, y)) & 0xFF);
+    }
+    public int getWidth() {
+        return img.getWidth();
+    }
+    public int getHeight() {
+        return img.getHeight();
+    }
 
 }

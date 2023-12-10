@@ -16,7 +16,7 @@ public class SetupManager {
     private SetupManager() {
         fps = new JFrame("fps graph");
         fps.setSize(412,260);
-        fps.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        fps.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         fps.setResizable(false);
         fpsPanel = new JPanel() {
             @Override
@@ -25,7 +25,7 @@ public class SetupManager {
 
                 g.setColor(Color.BLACK);
 
-                if(fpsArr != null) {
+                if(fpsArr != null && showFpsGraph) {
                     double max = 0.1;
                     double min = fpsArr[0];
 

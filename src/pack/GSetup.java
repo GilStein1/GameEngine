@@ -1,5 +1,7 @@
 package pack;
 
+import pack.Arrays.Queue;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +17,7 @@ public abstract class GSetup implements GSetups{
     public double lastTime = System.currentTimeMillis();
     public double currentTime;
     public boolean resize = true;
+    private boolean mouseOnFrame = true;
     private boolean isPainting;
     public String title = "";
     private JFrame frame;
@@ -22,6 +25,7 @@ public abstract class GSetup implements GSetups{
     private JPanel panel;
     private java.util.List<GPanel> panels = new java.util.ArrayList<>();
     private java.util.List<GFrameButton> buttons = new java.util.ArrayList<>();
+    private java.util.List<GFrameTextField> frameTextFields = new java.util.ArrayList<>();
     private java.util.List<GButton> gButtons = new java.util.ArrayList<>();
     private java.util.List<GTextField> gTextFields = new java.util.ArrayList<>();
     public Thread executed;
@@ -41,6 +45,7 @@ public abstract class GSetup implements GSetups{
     private KeyEventSupplier keyTyped;
     private KeyEventSupplier keyPressed;
     private KeyEventSupplier keyReleased;
+    private Queue<KeyAndActionPair> keyEventsPairs;
     private double[] fpsArr;
     private boolean leftMouseClicked = false;
     private boolean rightMouseClicked = false;
@@ -52,47 +57,90 @@ public abstract class GSetup implements GSetups{
         fpsArr = new double[100];
         Arrays.fill(fpsArr,0.0);
 
+        keyEventsPairs = new Queue<>();
+
         manager = SetupManager.getInstance();
         manager.setSetup(this);
 
         frame = new JFrame();
         count = 0;
-
-        frame.addKeyListener(new KeyListener() {
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
             @Override
-            public void keyTyped(KeyEvent e) {
-                if(keyTyped != null) {
-                    keyTyped.action(e);
-                }
-                for(GTextField t : gTextFields) {
-                    t.typed(e,lastKeyPressed == KeyEvent.VK_BACK_SPACE);
-                }
-            }
+            public boolean dispatchKeyEvent(KeyEvent e) {
 
-            @Override
-            public void keyPressed(KeyEvent e) {
-//                System.out.println(e.getKeyCode());
-                lastKeyPressed = e.getKeyCode();
-                if(keyPressed != null) {
-                    keyPressed.action(e);
-                }
-                lastCharPressed = e.getKeyChar();
-            }
+                if(e.getID() == KeyEvent.KEY_TYPED) {
+                    if(keyTyped != null) {
+//                    keyTyped.action(e);
+                        keyEventsPairs.insert(new KeyAndActionPair(keyTyped,e));
 
-            @Override
-            public void keyReleased(KeyEvent e) {
-
-                if(e.getKeyCode() == lastKeyPressed) {
-                    lastKeyPressed = -1;
+                    }
+                    for(GTextField t : gTextFields) {
+                        t.typed(e,lastKeyPressed == KeyEvent.VK_BACK_SPACE);
+                    }
                 }
-                if(keyReleased != null) {
-                    keyReleased.action(e);
+                if(e.getID() == KeyEvent.KEY_PRESSED) {
+                    lastKeyPressed = e.getKeyCode();
+                    if(keyPressed != null) {
+//                    keyPressed.action(e);
+                        keyEventsPairs.insert(new KeyAndActionPair(keyPressed,e));
+                    }
+                    lastCharPressed = e.getKeyChar();
                 }
-                if(e.getKeyChar() == lastCharPressed) {
-                    lastCharPressed = '~';
+                if(e.getID() == KeyEvent.KEY_RELEASED) {
+                    if(e.getKeyCode() == lastKeyPressed) {
+                        lastKeyPressed = -1;
+                    }
+                    if(keyReleased != null) {
+//                    keyReleased.action(e);
+                        keyEventsPairs.insert(new KeyAndActionPair(keyReleased,e));
+                    }
+                    if(e.getKeyChar() == lastCharPressed) {
+                        lastCharPressed = '~';
+                    }
                 }
+                return false;
             }
         });
+
+//        frame.addKeyListener(new KeyListener() {
+//            @Override
+//            public void keyTyped(KeyEvent e) {
+////                if(keyTyped != null) {
+//////                    keyTyped.action(e);
+////                    keyEventsPairs.insert(new KeyAndActionPair(keyTyped,e));
+////
+////                }
+////                for(GTextField t : gTextFields) {
+////                    t.typed(e,lastKeyPressed == KeyEvent.VK_BACK_SPACE);
+////                }
+//            }
+//
+//            @Override
+//            public void keyPressed(KeyEvent e) {
+////                System.out.println(e.getKeyCode());
+////                lastKeyPressed = e.getKeyCode();
+////                if(keyPressed != null) {
+//////                    keyPressed.action(e);
+////                    keyEventsPairs.insert(new KeyAndActionPair(keyPressed,e));
+////                }
+////                lastCharPressed = e.getKeyChar();
+//            }
+//
+//            @Override
+//            public void keyReleased(KeyEvent e) {
+//
+////                if(e.getKeyCode() == lastKeyPressed) {
+////                    lastKeyPressed = -1;
+////                }
+////                if(keyReleased != null) {
+//////                    keyReleased.action(e);
+////                    keyEventsPairs.insert(new KeyAndActionPair(keyReleased,e));
+////                }
+////                if(e.getKeyChar() == lastCharPressed) {
+////                    lastCharPressed = '~';
+////                }
+//            }
+//        });
 
         frame.addWindowListener(new WindowListener() {
             @Override
@@ -156,6 +204,12 @@ public abstract class GSetup implements GSetups{
 
                     xScreen = (int)MouseInfo.getPointerInfo().getLocation().getX() - 8;
                     yScreen = (int)MouseInfo.getPointerInfo().getLocation().getY() - 31;
+
+                    while (!keyEventsPairs.isEmpty()){
+                        KeyAndActionPair pair = keyEventsPairs.remove();
+                        pair.getAction().action(pair.getEvent());
+                    }
+
                     execute();
                 }
 
@@ -202,7 +256,11 @@ public abstract class GSetup implements GSetups{
         frame.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-
+                for(GFrameTextField textField : frameTextFields) {
+                    textField.isPressed();
+                    panel.remove(textField.getJTextField());
+                    panel.add(textField.getJTextField());
+                }
             }
 
             @Override
@@ -239,12 +297,12 @@ public abstract class GSetup implements GSetups{
 
             @Override
             public void mouseEntered(MouseEvent e) {
-
+                mouseOnFrame = true;
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-
+                mouseOnFrame = false;
             }
         });
 
@@ -336,6 +394,35 @@ public abstract class GSetup implements GSetups{
             graphics.fillRect(x,y,width,height);
         }
     }
+    public void drawPolygon(Vec2D[] points, Color color) {
+        int[] x = new int[points.length];
+        int[] y = new int[points.length];
+        for(int i = 0; i < points.length; i++) {
+            x[i] = (int) points[i].x;
+            y[i] = (int) points[i].y;
+        }
+        graphics.setColor(color);
+        graphics.drawPolygon(x,y, points.length);
+    }
+    public void drawPolygon(int[] x, int[] y, Color color) {
+        graphics.setColor(color);
+        graphics.drawPolygon(x,y,x.length);
+    }
+
+    public void fillPolygon(Vec2D[] points, Color color) {
+        int[] x = new int[points.length];
+        int[] y = new int[points.length];
+        for(int i = 0; i < points.length; i++) {
+            x[i] = (int) points[i].x;
+            y[i] = (int) points[i].y;
+        }
+        graphics.setColor(color);
+        graphics.fillPolygon(x,y, points.length);
+    }
+    public void fillPolygon(int[] x, int[] y, Color color) {
+        graphics.setColor(color);
+        graphics.fillPolygon(x,y,x.length);
+    }
     /**
      * פעולה המציירת קו על המסך בין שתי נקודות נתונות
      * @param     x1 המיקום על הציר האופקי של הנקודה הראשונה על המסך
@@ -405,15 +492,26 @@ public abstract class GSetup implements GSetups{
      *פעולה המאפשרת הוספת כפתור למסך
      * @param     button הכפתור אותו רוצים להוסיף
      */
-    public void addButton(GFrameButton button) {
+    public void addFrameButton(GFrameButton button) {
         panel.add(button.getJButton());
         buttons.add(button);
+    }
+    public void addFrameTextField(GFrameTextField textField) {
+        panel.add(textField.getJTextField());
+        frameTextFields.add(textField);
     }
     public void addGButton(GButton button) {
         gButtons.add(button);
     }
     public void addGTextField(GTextField textField) {
         gTextFields.add(textField);
+    }
+    public void mouseClickedFromOutSide() {
+        if(!mouseOnFrame) {
+            for(GTextField textField : gTextFields) {
+                textField.turnOff();
+            }
+        }
     }
     public void addGPanel(GPanel panel) {
         panels.add(panel);
