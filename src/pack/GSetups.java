@@ -3,19 +3,23 @@ package pack;
 public interface GSetups {
 
     /**
-     * זו הפעולה שרצה בתכילת התוכנית, היא מיועדת להגדרת מאפייני המסך וקביעת משתנים התחלתיים
+     * The first method to run at the beginning of the program.
+     * The initialize method is used to initialize values and parameters
      */
     public void initialize();
     /**
-     * הפעולה שרצה בכל מחזור של התוכנית
+     * The method to be executed repeatedly as long as the program is running (runs on a separate thread).
+     * At the end of each cycle, the frame is being drawn.
+     * At the start of each cycle, the deltaTime and currentFPS values are updated.
      */
     public void execute();
     /**
-     * הפעולה האחרונה שצרוץ בתוכנית, תרוץ עם סגירת התוכנית
+     * The method to run at the end of the program, is called when the frame's WindowListener detects the window is being closed.
      */
     public void lastFunction();
     /**
-     * פעולה שמטרתה לסגור את התוכנית אם מתקבל ערך בוליאני חיובי שהפעולה תחזיר, בברירת המחדל הפעולה תחזיר ערך בוליאני שלילי ובכך התוכנה לא תפסק
+     * The method to decide when the program should end
+     * @return the value that decides if the program should stop running.
      */
     public boolean end();
 

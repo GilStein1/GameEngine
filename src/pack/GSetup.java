@@ -341,12 +341,12 @@ public abstract class GSetup implements GSetups{
 
     }
     /**
-     * פעולה שמציירת עיגול/אליפסה ריקים על המסך - רק את המסגרת של הצורה על פי צבע נתון, מיקום נתון ומימדים נתונים
-     * @param     x המיקום על הציר האופקי של הצורה על המסך
-     * @param     y המיקום על הציר האנכי של הצורה על המסך
-     * @param     width רוחב הצורה
-     * @param     height אורך הצורה
-     * @param     color צבע הצורה
+     * Draws an ellipse on the screen
+     * @param     x the x of the ellipse
+     * @param     y the y of the ellipse
+     * @param     width the width of the ellipse
+     * @param     height the height of the ellipse
+     * @param     color the color of the ellipse
      */
     public void drawEllipse(int x, int y, int width, int height, Color color) {
         if(img != null) {
@@ -355,12 +355,12 @@ public abstract class GSetup implements GSetups{
         }
     }
     /**
-     * פעולה שמציירת עיגול/אליפסה על המסך על פי צבע נתון, מיקום נתון ומימדים נתונים
-     * @param     x המיקום על הציר האופקי של הצורה על המסך
-     * @param     y המיקום על הציר האנכי של הצורה על המסך
-     * @param     width רוחב הצורה
-     * @param     height אורך הצורה
-     * @param     color צבע הצורה
+     * Fills an ellipse on the screen
+     * @param     x the x of the ellipse
+     * @param     y the y of the ellipse
+     * @param     width the width of the ellipse
+     * @param     height the height of the ellipse
+     * @param     color the color of the ellipse
      */
     public void fillEllipse(int x, int y, int width, int height, Color color) {
         if(img != null) {
@@ -369,12 +369,12 @@ public abstract class GSetup implements GSetups{
         }
     }
     /**
-     * פעולה שמציירת ריבוע/מלבן ריקים על המסך - רק את המסגרת של הצורה על פי צבע נתון, מיקום נתון ומימדים נתונים
-     * @param     x המיקום על הציר האופקי של הצורה על המסך
-     * @param     y המיקום על הציר האנכי של הצורה על המסך
-     * @param     width רוחב הצורה
-     * @param     height אורך הצורה
-     * @param     color צבע הצורה
+     *Draws a rectangle on the screen
+     * @param     x the x of the rectangle
+     * @param     y the y of the rectangle
+     * @param     width the width of the rectangle
+     * @param     height the height of the rectangle
+     * @param     color the color of the rectangle
      */
     public void drawRectangle(int x, int y, int width, int height, Color color) {
         if(img != null) {
@@ -383,12 +383,12 @@ public abstract class GSetup implements GSetups{
         }
     }
     /**
-     * פעולה שמציירת ריבוע/מלבן על המסך על פי צבע נתון, מיקום נתון ומימדים נתונים
-     * @param     x המיקום על הציר האופקי של הצורה על המסך
-     * @param     y המיקום על הציר האנכי של הצורה על המסך
-     * @param     width רוחב הצורה
-     * @param     height אורך הצורה
-     * @param     color צבע הצורה
+     *Fills a rectangle on the screen
+     * @param     x the x of the rectangle
+     * @param     y the y of the rectangle
+     * @param     width the width of the rectangle
+     * @param     height the height of the rectangle
+     * @param     color the color of the rectangle
      */
     public void fillRectangle(int x, int y, int width, int height, Color color) {
         if(img != null) {
@@ -396,6 +396,11 @@ public abstract class GSetup implements GSetups{
             graphics.fillRect(x,y,width,height);
         }
     }
+    /**
+     *Draws a polygon by a set of given points
+     * @param points the array of points of the polygon
+     * @param color the color of the polygon
+     */
     public void drawPolygon(Vec2D[] points, Color color) {
         int[] x = new int[points.length];
         int[] y = new int[points.length];
@@ -406,11 +411,21 @@ public abstract class GSetup implements GSetups{
         graphics.setColor(color);
         graphics.drawPolygon(x,y, points.length);
     }
+    /**
+     *Draws a polygon by a set of given points
+     * @param x an array of x coordinates
+     * @param y an array of y coordinates
+     * @param color the color of the polygon
+     */
     public void drawPolygon(int[] x, int[] y, Color color) {
         graphics.setColor(color);
         graphics.drawPolygon(x,y,x.length);
     }
-
+    /**
+     *Fills a polygon by a set of given points
+     * @param points the array of points of the polygon
+     * @param color the color of the polygon
+     */
     public void fillPolygon(Vec2D[] points, Color color) {
         int[] x = new int[points.length];
         int[] y = new int[points.length];
@@ -421,17 +436,23 @@ public abstract class GSetup implements GSetups{
         graphics.setColor(color);
         graphics.fillPolygon(x,y, points.length);
     }
+    /**
+     *Fills a polygon by a set of given points
+     * @param x an array of x coordinates
+     * @param y an array of y coordinates
+     * @param color the color of the polygon
+     */
     public void fillPolygon(int[] x, int[] y, Color color) {
         graphics.setColor(color);
         graphics.fillPolygon(x,y,x.length);
     }
     /**
-     * פעולה המציירת קו על המסך בין שתי נקודות נתונות
-     * @param     x1 המיקום על הציר האופקי של הנקודה הראשונה על המסך
-     * @param     y1 המיקום על הציר האנכי של הנקודה הראשונה על המסך
-     * @param     x2 המיקום על הציר האופקי של הנקודה השנייה על המסך
-     * @param     y2 המיקום על הציר האנכי של הנקודה השנייה על המסך
-     * @param     color צבע הקו
+     * Draws a line through 2 points
+     * @param     x1 the x of the first point
+     * @param     y1 the y of the first point
+     * @param     x2 the x of the second point
+     * @param     y2 the y of the second point
+     * @param     color the color of the line
      */
     public void drawLine(int x1, int y1, int x2, int y2, Color color) {
         if(img != null) {
@@ -440,11 +461,11 @@ public abstract class GSetup implements GSetups{
         }
     }
     /**
-     * פעולה המקבלת טקסט ומציירת אותו על המסך על פי מיקום נתון וצבע נתון. אפשר להגדיר את הפונט של הכתיבה עם אובייקט הפונט של ג'אווה
-     * @param     x המיקום על הציר האופקי של הטקסט
-     * @param     y המיקום על הציר האנכי של הטקסט
-     * @param     text הטקסט אותו רוצים להדפיס על המסך
-     * @param     color צבע הטקסט
+     *Draws text on the screen (font can be edited using the setFont() method)
+     * @param     x the x of the text
+     * @param     y the y of the text
+     * @param     text the text to be drawn
+     * @param     color the color of the text
      */
     public void drawText(int x, int y,String text, Color color) {
         if(img != null) {
@@ -454,12 +475,12 @@ public abstract class GSetup implements GSetups{
         }
     }
     /**
-     * פעולה שמציירת תמונה על המסך על פי קובץ תמונה נתון, מיקום נתון ומימדים נתונים
-     * @param     x המיקום על הציר האופקי של התמונה על המסך
-     * @param     y המיקום על הציר האנכי של התמונה על המסך
-     * @param     width רוחב התמונה
-     * @param     height אורך התמונה
-     * @param     image התמונה אותה הפעולה קוראת ומציירת על המסך
+     *Draws an image on the screen by given coordinates and dimensions and a GImage
+     * @param     x the x of the image
+     * @param     y the y of the image
+     * @param     width the width of the image
+     * @param     height the height of the image
+     * @param     image the image to be drawn
      */
     public void drawImage(int x, int y, int width, int height, GImage image) {
 
@@ -478,12 +499,12 @@ public abstract class GSetup implements GSetups{
         }
     }
     /**
-     * פעולה שמציירת תמונה על המסך על פי קובץ תמונה נתון, מיקום נתון ומימדים נתונים
-     * @param     x המיקום על הציר האופקי של התמונה על המסך
-     * @param     y המיקום על הציר האנכי של התמונה על המסך
-     * @param     width רוחב התמונה
-     * @param     height אורך התמונה
-     * @param     path שם הקובץ של התמונה אותה הפעולה קוראת ומציירת על המסך
+     *Draws an image on the screen by given coordinates and dimensions and a path to the image in the resources directory
+     * @param     x the x of the image
+     * @param     y the y of the image
+     * @param     width the width of the image
+     * @param     height the height of the image
+     * @param     path the path of the image
      */
     public void drawImage(int x, int y, int width, int height, String path) {
 
@@ -495,27 +516,47 @@ public abstract class GSetup implements GSetups{
             throw new RuntimeException(e);
         }
     }
+    /**
+     *Draws a GButton on the screen
+     * @param     button the GButton to be drawn
+     */
     public void drawButton(GButton button) {
         button.draw(graphics,xOnCanvas(),yOnCanvas());
     }
+    /**
+     *Draws a GTextField on the screen
+     * @param     textField the GTextField to be drawn
+     */
     public void drawTextField(GTextField textField) {
         textField.draw(graphics);
     }
     /**
-     *פעולה המאפשרת הוספת כפתור למסך
-     * @param     button הכפתור אותו רוצים להוסיף
+     *Adds a GFrameButton to the setup
+     * @param     button the button
      */
     public void addFrameButton(GFrameButton button) {
         panel.add(button.getJButton());
         buttons.add(button);
     }
+    /**
+     *Adds a GFrameTextField to the setup
+     * @param textField the GFrameTextField
+     */
     public void addFrameTextField(GFrameTextField textField) {
         panel.add(textField.getJTextField());
         frameTextFields.add(textField);
     }
+    /**
+     *Adds a GButton to the setup
+     * @param     button the button
+     */
     public void addGButton(GButton button) {
         gButtons.add(button);
     }
+    /**
+     *Adds a GTextField to the setup
+     * @param     textField the GTextField
+     */
     public void addGTextField(GTextField textField) {
         gTextFields.add(textField);
     }
@@ -526,6 +567,10 @@ public abstract class GSetup implements GSetups{
             }
         }
     }
+    /**
+     *Adds a GPanel to the setup
+     * @param     panel the panel
+     */
     public void addGPanel(GPanel panel) {
         panels.add(panel);
         panel.isAdded = true;
@@ -541,8 +586,8 @@ public abstract class GSetup implements GSetups{
     }
 
     /**
-     *פעולה המקבלת תמונה ומשנה את אייקון החלון לתמונה הנתונה
-     * @param     path שם ומיקום קובץ התמונה שרוצים לשים כאייקון לחלון
+     * Sets the icon of the frame to an image given from a path
+     * @param     path the path to the image
      */
     public void setFrameIcon(String path){
 
@@ -558,8 +603,8 @@ public abstract class GSetup implements GSetups{
         }
     }
     /**
-     *פעולה המקבלת תמונה ומשנה את אייקון החלון לתמונה הנתונה
-     * @param image התמונה הרצוייה
+     * Sets the icon of the frame to a given GImage
+     * @param     image the image
      */
     public void setFrameIcon(GImage image) {
         frameIcon = image.getImage();
@@ -568,31 +613,31 @@ public abstract class GSetup implements GSetups{
         }
     }
     /**
-     *פעולה המשנה את פונט הכתיבה הנוכחי על המסך על פי פונט נתון
-     * @param font הפונט הרצוי
+     * Sets a new font
+     * @param     font the new font
      */
     public void setFont(Font font) {
         this.font = font;
         updateFont = true;
     }
     /**
-     *פעולה הקובעת את רוחב וגובה חלון התוכנית
-     * @param width רוחב המסך
-     * @param height גובה המסך
+     * Sets new dimensions for the screen
+     * @param width the width of the screen
+     * @param height the height of the screen
      */
     public void setFrameSize(int width, int height) {
         frameWidth = width;
         frameHeight = height;
     }
     /**
-     *פעולה הקובעת האם אפשרי שינוי גודל המסך על ידי המשתמש
+     * No explanation needed
      */
     public void setResizable(boolean resize) {
         this.resize = resize;
     }
     /**
-     *פעולה המשנה את כותרת התוכנית על פי טקסט נתון
-     * @param title כותרת החלון
+     * Sets the title of the screen
+     * @param     title the new title
      */
     public void setTitle(String title) {
         this.title = title;
@@ -601,25 +646,33 @@ public abstract class GSetup implements GSetups{
         }
     }
     /**
-     *פעולה המשנה את צבע רקע התוכנית על פי צבע רקע נתון
-     * @param color צבע הרקע החדש
+     * Sets the default background color of the screen
+     * @param     color the color
      */
     public void setBackground(Color color) {
         panel.setBackground(color);
         defaultBackground = color;
     }
     /**
-     * פעולה המחזירה את הזמן שעבר בין כל מחזור של התוכנית, משמש לספירת זמנים בלי חששות מקצב המחזוריות הלא קבוע של התוכנה
-     * @return  מחזיר את הזמן שעבר מהפריים האחרון בשניות
+     * @return the time passed since the last frame in seconds
      */
     public double deltaTime() {
         return ((currentTime - lastTime)/1000 < 1000000000 && (currentTime - lastTime)/1000 > 0)? (currentTime - lastTime)/1000 : 0;
 //        return (currentTime - lastTime)/1000;
     }
+    /**
+     * Shows the regular JColorChooser dialog
+     */
     public Color GColorPicker() {
         JColorChooser j = new JColorChooser();
         return JColorChooser.showDialog(j,"Color Picker",Color.WHITE);
     }
+    /**
+     * Creates a new GFile object based on a path to a file.
+     * If the given file does not exist, it will create a new file in that name
+     * @param     path the path to the file
+     * @param     name the name of the file
+     */
     public GFile loadFile(String path, String name) {
         File f = new File(path);
 
@@ -630,6 +683,11 @@ public abstract class GSetup implements GSetups{
 
         return new GFile(f);
     }
+    /**
+     * Creates a new GFile object in the GSetup resources directory.
+     * If the given file name does not already exist in the GSetup resources directory, it will create a new file in that name
+     * @param     name the name of the file
+     */
     public GFile loadFileInGSetupResources(String name) {
 
         File f = new File(getPath() + "/GSetup");
@@ -651,6 +709,10 @@ public abstract class GSetup implements GSetups{
 
         return new GFile(f);
     }
+    /**
+     * Creates a new GImage object from an image file.
+     * @param     path the path to the image file
+     */
     public GImage loadFromPath(String path) {
         try {
             return new GImage(ImageIO.read(new File(path)));
@@ -658,81 +720,97 @@ public abstract class GSetup implements GSetups{
             throw new RuntimeException(e);
         }
     }
+    /**
+     * @return  the path to the project (or jar file if compiled)
+     */
     public String getPath() {
         return System.getProperty("user.dir");
     }
+    /**
+     * Shows the regular JFileChooser dialog
+     */
     public String GFileChooser(String approveButton) {
         JFileChooser fc = new JFileChooser();
         fc.showDialog(frame,approveButton);
         return fc.getSelectedFile().getAbsolutePath();
     }
+    /**
+     * @return  the BufferedImage object of the GImage of the canvas
+     */
     public BufferedImage getBufferedImg() {
         return img;
     }
+    /**
+     * @return  the GImage object of the canvas
+     */
     public GImage getGImage() {
         return new GImage(img);
     }
+    /**
+     * @return  the current width of the screen
+     */
     public int getFrameWidth() {
         return frame.getWidth();
     }
+    /**
+     * @return  the current height of the screen
+     */
     public int getFrameHeight() {
         return frame.getHeight();
     }
     /**
-     * @return  את המקום על הציר האופקי של העכבר ביחס למסך (ולא ביחס לחלון)
+     * @return  the x of the cursor on the screen
      */
     public int xOnScreen() {
-//        this.mousePos = MouseInfo.getPointerInfo().getLocation();
-//        return (int)this.mousePos.getX();
         return xScreen;
     }
     /**
-     * @return  את המקום על הציר האנכי של העכבר ביחס למסך (ולא ביחס לחלון)
+     * @return  the y of the cursor on the screen
      */
     public int yOnScreen() {
-//        this.mousePos = MouseInfo.getPointerInfo().getLocation();
-//        return (int)this.mousePos.getY();
         return yScreen;
     }
     /**
-     * @return  את המיקום על הציר האופקי של העכבר ביחס לחלון
+     * @return  the x of the cursor on the canvas
      */
     public int xOnCanvas() {
-//        this.mousePos = MouseInfo.getPointerInfo().getLocation();
-//        return (int)this.mousePos.getX() - frame.getX();
         return xScreen - frame.getX();
     }
     /**
-     * @return  את המיקום על הציר האנכי של העכבר ביחס לחלון
+     * @return  the y of the cursor on the canvas
      */
     public int yOnCanvas() {
-//        this.mousePos = MouseInfo.getPointerInfo().getLocation();
-//        return (int)this.mousePos.getY() - frame.getY();
         return yScreen - frame.getY();
     }
     public double[] getFpsArr() {
         return fpsArr;
     }
     /**
-     * @return  את ערך הכפתור האחרון שנלחץ במקלדת
+     * @return  the last key that the user pressed
      */
     public int lastKey() {
         return lastKeyPressed;
     }
     /**
-     * @return  את ערך האות האחרונה שנלחצה במקלדת
+     * @return  the char value of the last key that the user pressed
      */
     public char lastKeyChar() {
         return lastCharPressed;
     }
+    /**
+     * @return  if left click
+     */
     public boolean leftClick() {
         return leftMouseClicked;
     }
+    /**
+     * @return  if right click
+     */
     public boolean rightClick() {
         return rightMouseClicked;
     }
     /**
-     * @return  את מהירות החלפת הפריימים העדכנית
+     * @return  the current fps
      */
     public double currentFPS() {
         return fps;

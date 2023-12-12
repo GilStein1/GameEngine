@@ -49,24 +49,39 @@ public class GFrameButton {
             }
         });
     }
+    /**
+     * Sets the background color of the button
+     */
     public void setBackground(Color background) {
         button.setBackground(background);
     }
+    /**
+     * Sets the text to be written on the button
+     */
     public void setText(String text) {
         button.setText(text);
     }
+    /**
+     * Sets the font of the text on the button
+     */
     public void setFont(Font font) {
         button.setFont(font);
     }
     public JButton getJButton() {
         return button;
     }
+    /**
+     * Sets the button to not be pressed
+     */
     public void reset() {
         isPressed = false;
     }
     public String getText() {
         return button.getText();
     }
+    /**
+     * @return if the button is pressed
+     */
     public boolean isPressed() {
         return isPressed;
     }

@@ -38,8 +38,6 @@ public class GTextField implements GComponent {
         this.height = height;
         img.fillRectangle(0,0,img.getImage().getWidth(),img.getImage().getHeight(),background);
     }
-
-
     private boolean isPressed() {
         return  setupManager.getSetup().xOnCanvas() > this.x && setupManager.getSetup().yOnCanvas() > this.y && setupManager.getSetup().xOnCanvas() < this.x + this.width && setupManager.getSetup().yOnCanvas() < this.y + this.height;
     }
@@ -94,15 +92,27 @@ public class GTextField implements GComponent {
             g.drawRect(x,y,width,height);
         }
     }
+    /**
+     * @return the text
+     */
     public String getText() {
         return text;
     }
+    /**
+     * @return if the text field is selected
+     */
     public boolean isActive() {
         return isActive;
     }
+    /**
+     * Hides the frame around the text field
+     */
     public void hideFrame(boolean hide) {
         showFrame = !hide;
     }
+    /**
+     * Sets the color of the text
+     */
     public void setTextColor(Color color) {
         this.textColor = color;
     }

@@ -56,12 +56,21 @@ public class GButton implements GComponent {
     void setPressed(boolean is) {
         mousePressed = is;
     }
+    /**
+     * @return if the button is pressed
+     */
     public boolean isPressed() {
         return mousePressed && setupManager.getSetup().xOnCanvas() > this.x && setupManager.getSetup().yOnCanvas() > this.y && setupManager.getSetup().xOnCanvas() < this.x + this.width && setupManager.getSetup().yOnCanvas() < this.y + this.height;
     }
+    /**
+     * @return the GImage of the button
+     */
     public GImage getGImage() {
         return new GImage(image);
     }
+    /**
+     * Sets a new GImage to the button
+     */
     public void setGImage(GImage newImg) {
         image = new GImage(newImg);
         image2 = new GImage(newImg);
@@ -69,6 +78,9 @@ public class GButton implements GComponent {
         image3.fillRectangle(0,0,image2.getImage().getWidth(),image2.getImage().getHeight(),new Color(0,0,0,76));
         image2.fillRectangle(0,0,image2.getImage().getWidth(),image2.getImage().getHeight(),new Color(0,0,0,25));
     }
+    /**
+     * @return if the cursor is hovering over the button
+     */
     public boolean isMouseHovering() {
 
         int x = SetupManager.getInstance().getSetup().xOnCanvas();

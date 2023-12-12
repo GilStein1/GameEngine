@@ -49,9 +49,16 @@ public class GFrameTextField implements GComponent {
     void isPressed() {
         textField.setFocusable(false);
     }
+    /**
+     * @return the text
+     */
     public String getText() {
         return textField.getText();
     }
+    /**
+     * Sets the font of the text
+     * @param font the new font
+     */
     public void setFont(Font font) {
         textField.setFont(font);
     }

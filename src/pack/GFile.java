@@ -22,6 +22,9 @@ public class GFile {
             }
         }
     }
+    /**
+     * @return a String (if the file is a txt file), containing the String in the file.
+     */
     public String read() {
         try {
             fileReader = new FileReader(file);
@@ -47,6 +50,9 @@ public class GFile {
         }
         return fileContent;
     }
+    /**
+     * Prints new text into the file (if the file is a txt file).
+     */
     public void print(String text) {
         if (!isEditing) {
             isEditing = true;
@@ -64,8 +70,10 @@ public class GFile {
                 throw new RuntimeException(e);
             }
         }
-
     }
+    /**
+     * Prints text in a new line in the file (if the file is a txt file).
+     */
     public void println(String text) {
         if (!isEditing) {
             isEditing = true;
@@ -90,6 +98,9 @@ public class GFile {
         }
 
     }
+    /**
+     * Stops the writing to the file
+     */
     public void stopWriting() {
         try {
             fileWriter.close();
@@ -98,6 +109,9 @@ public class GFile {
         }
         isEditing = false;
     }
+    /**
+     * @return if a new file in that name was recently created
+     */
     public boolean accidentallyCreatedNewFile() {
         return accidentallyCreatedNewFile;
     }
