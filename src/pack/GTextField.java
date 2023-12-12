@@ -3,7 +3,7 @@ package pack;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-public class GTextField implements Component{
+public class GTextField implements GComponent {
 
     private int x,y,width,height;
     private Color background;
@@ -13,6 +13,7 @@ public class GTextField implements Component{
     private SetupManager setupManager;
     private GImage img;
     private String text = "";
+    private Color textColor = Color.BLACK;
     private double timeCountForAnimation = 0;
 
     public GTextField(int x, int y, int width, int height) {
@@ -64,11 +65,13 @@ public class GTextField implements Component{
 
 //        img = new GImage(width,height);
         if(background == null) {
-            img.drawText(10,20,text + (((int)timeCountForAnimation)%2 == 0 ? "|" : ""),Color.BLACK);
+            img = new GImage(width,height);
+            img.setFont(new Font("ariel",Font.PLAIN,20));
+            img.drawText(10,20,text + (((int)timeCountForAnimation)%2 == 0 ? "|" : ""),textColor);
         }
         else {
             img.fillRectangle(0,0,img.getImage().getWidth(),img.getImage().getHeight(),background);
-            img.drawText(0,20,text + (((int)timeCountForAnimation)%2 == 0 ? "|" : ""),Color.BLACK);
+            img.drawText(0,20,text + (((int)timeCountForAnimation)%2 == 0 ? "|" : ""),textColor);
         }
 
     }
@@ -100,6 +103,9 @@ public class GTextField implements Component{
     public void hideFrame(boolean hide) {
         showFrame = !hide;
     }
+    public void setTextColor(Color color) {
+        this.textColor = color;
+    }
 
     @Override
     public void tickUpdate() {
@@ -108,12 +114,13 @@ public class GTextField implements Component{
             timeCountForAnimation = 0;
         }
         if(background == null) {
-            img.drawText(10,20,text + (((int)timeCountForAnimation)%2 == 0 && isActive ? "|" : ""),Color.BLACK);
+            img = new GImage(width,height);
+            img.setFont(new Font("ariel",Font.PLAIN,20));
+            img.drawText(10,20,text + (((int)timeCountForAnimation)%2 == 0 && isActive ? "|" : ""),textColor);
         }
         else {
             img.fillRectangle(0,0,img.getImage().getWidth(),img.getImage().getHeight(),background);
-            img.drawText(0,20,text + (((int)timeCountForAnimation)%2 == 0 && isActive ? "|" : ""),Color.BLACK);
+            img.drawText(0,20,text + (((int)timeCountForAnimation)%2 == 0 && isActive ? "|" : ""),textColor);
         }
-
     }
 }

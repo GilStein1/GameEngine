@@ -9,6 +9,7 @@ public class GImage {
 
     private BufferedImage img;
     private Graphics graphics;
+    private double angle = 0;
 
     public GImage(String path) {
 
@@ -23,6 +24,12 @@ public class GImage {
     public GImage(int width, int height) {
         img = new BufferedImage(width,height,BufferedImage.TYPE_INT_ARGB);
         graphics = img.createGraphics();
+    }
+    public double getAngle() {
+        return angle;
+    }
+    public void setAngle(double angle) {
+        this.angle = angle;
     }
     public GImage(BufferedImage image) {
         img = new BufferedImage(image.getWidth(),image.getHeight(),BufferedImage.TYPE_INT_ARGB);
@@ -113,6 +120,13 @@ public class GImage {
     }
     public int getHeight() {
         return img.getHeight();
+    }
+    public void exportAsPNG(GFile file) {
+        try {
+            ImageIO.write(img,"PNG",file.getFile());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

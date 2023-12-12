@@ -7,7 +7,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
+import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 
 public abstract class GSetup implements GSetups{
@@ -461,8 +463,19 @@ public abstract class GSetup implements GSetups{
      */
     public void drawImage(int x, int y, int width, int height, GImage image) {
 
-        graphics.drawImage(image.getImage(),x,y,width,height,null);
+        if(image.getAngle() != 0) {
+            graphics.translate(x + width/2,y + height/2);
 
+            graphics.rotate(Math.toRadians(image.getAngle()));
+
+            graphics.drawImage(image.getImage(),-(width/2),-(height/2),width,height,null);
+
+            graphics.rotate(-Math.toRadians(image.getAngle()));
+            graphics.translate(-x - width/2,-y - height/2);
+        }
+        else {
+            graphics.drawImage(image.getImage(),x,y,width,height,null);
+        }
     }
     /**
      * פעולה שמציירת תמונה על המסך על פי קובץ תמונה נתון, מיקום נתון ומימדים נתונים
@@ -606,6 +619,52 @@ public abstract class GSetup implements GSetups{
     public Color GColorPicker() {
         JColorChooser j = new JColorChooser();
         return JColorChooser.showDialog(j,"Color Picker",Color.WHITE);
+    }
+    public GFile loadFile(String path, String name) {
+        File f = new File(path);
+
+        if(!f.exists()) {
+            f.mkdir();
+        }
+        f = new File(path + "/" + name);
+
+        return new GFile(f);
+    }
+    public GFile loadFileInGSetupResources(String name) {
+
+        File f = new File(getPath() + "/GSetup");
+
+        if(!f.exists()) {
+            f.mkdir();
+        }
+        String s = getClass().getName();
+        s = s.split("\\.")[s.split("\\.").length - 1];
+        f = new File(getPath() + "/GSetup/" + s);
+        if(!f.exists()) {
+            f.mkdir();
+        }
+        f = new File(getPath() + "\\GSetup\\" + s + "\\" + name);
+
+//        System.out.println(f.exists());
+
+//        System.out.println(getPath() + "\\GSetup\\" + s + "\\" + name);
+
+        return new GFile(f);
+    }
+    public GImage loadFromPath(String path) {
+        try {
+            return new GImage(ImageIO.read(new File(path)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public String getPath() {
+        return System.getProperty("user.dir");
+    }
+    public String GFileChooser(String approveButton) {
+        JFileChooser fc = new JFileChooser();
+        fc.showDialog(frame,approveButton);
+        return fc.getSelectedFile().getAbsolutePath();
     }
     public BufferedImage getBufferedImg() {
         return img;

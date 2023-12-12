@@ -2,7 +2,7 @@ package pack;
 
 import java.awt.*;
 
-public class GButton implements Component{
+public class GButton implements GComponent {
 
     private int x,y,width,height;
     private Color c;

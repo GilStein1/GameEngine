@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-public class GFrameTextField implements Component{
+public class GFrameTextField implements GComponent {
 
     private JTextField textField;
 

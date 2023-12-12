@@ -7,7 +7,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-public class GPanel implements Component{
+public class GPanel implements GComponent {
 
     private JFrame frame;
     private GImage image1;

@@ -1,6 +1,6 @@
 package pack;
 
-public interface Component {
+public interface GComponent {
     public void tickUpdate();
 
 }

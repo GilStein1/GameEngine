@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class SetupManager {
 
     private static SetupManager instance;
-    private static ArrayList<Component> tickCalls = new ArrayList<>();
+    private static ArrayList<GComponent> tickCalls = new ArrayList<>();
     private GSetups setup;
     private JFrame fps;
     private JPanel fpsPanel;
@@ -58,11 +58,11 @@ public class SetupManager {
         this.setup = setup;
         fpsArr = setup.getFpsArr();
     }
-    public static void addTick(Component component) {
-        tickCalls.add(component);
+    public static void addTick(GComponent GComponent) {
+        tickCalls.add(GComponent);
     }
     static void callTick() {
-        for(Component c : tickCalls) {
+        for(GComponent c : tickCalls) {
             c.tickUpdate();
         }
     }
