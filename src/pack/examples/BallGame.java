@@ -19,7 +19,9 @@ public class BallGame extends GSetup {
     public void initialize() {
         setResizable(false);
         setTitle("Ball");
-        setFrameIcon("circle.png");
+        GImage icon = new GImage(100,100);
+        icon.fillEllipse(0,0,100,100,Color.BLUE);
+        setFrameIcon(icon);
         setFrameSize(908,607);
 //        SetupManager.Debug.fpsGraph();
     }
@@ -67,7 +69,7 @@ public class BallGame extends GSetup {
         gi.fillRectangle(0,0, getBufferedImg().getWidth(), getBufferedImg().getHeight(), Color.WHITE);
         gi.drawImage(-getBufferedImg().getWidth()/2,-getBufferedImg().getHeight()/2, 2* getBufferedImg().getWidth(), 2* getBufferedImg().getHeight(),new GImage(getBufferedImg()));
 
-        setFrameIcon(gi);
+//        setFrameIcon(gi);
 
     }
 

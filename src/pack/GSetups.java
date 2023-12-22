@@ -27,6 +27,7 @@ public interface GSetups {
     double currentFPS();
     void addGButton(GButton button);
     void addGTextField(GTextField textField);
+    void addGTextView(GTextView textView);
     int xOnCanvas();
     int yOnCanvas();
     int xOnScreen();

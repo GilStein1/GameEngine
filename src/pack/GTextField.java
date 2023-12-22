@@ -85,7 +85,7 @@ public class GTextField implements GComponent {
 
         mousePressed = is;
     }
-    void draw(Graphics g) {
+    public void draw(Graphics g) {
         g.drawImage(img.getImage(),x,y,width,height,null);
         g.setColor(Color.BLACK);
         if(showFrame) {

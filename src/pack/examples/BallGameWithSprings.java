@@ -66,6 +66,9 @@ public class BallGameWithSprings extends GSetup {
         v.x = v.x + a.x * deltaTime();
         v.y = v.y + a.y * deltaTime();
 
+        v.x -= 0.1*v.x*deltaTime();
+        v.y -= 0.1*v.y*deltaTime();
+
         v.x = (pos.x - 50 > 0)? v.x : -v.x;
         v.y = (pos.y - 50 > 0)? v.y : -v.y;
 

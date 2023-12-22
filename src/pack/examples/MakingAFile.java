@@ -10,7 +10,8 @@ public class MakingAFile extends GSetup {
     GFile f;
     @Override
     public void initialize() {
-        f = loadFileInGSetupResources("ThisIsAFile.txt");
+//        f = loadFileInGSetupResources("ThisIsAFile.txt");
+        f = loadFile(GFolderChooser("Enter"),"Hello.txt");
         f.println("Hello.");
         f.println("I Just Made A File");
         f.stopWriting();

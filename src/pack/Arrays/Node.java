@@ -1,8 +1,5 @@
 package pack.Arrays;
 
-/**
- * Created by Student on 16/01/2018.
- */
 public class Node<T> {
 
     private T value;

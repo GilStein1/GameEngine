@@ -66,4 +66,9 @@ public class GFrameTextField implements GComponent {
     public void tickUpdate() {
 
     }
+
+    @Override
+    public void draw(Graphics g) {
+
+    }
 }

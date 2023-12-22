@@ -155,4 +155,9 @@ public class GPanel implements GComponent {
     public void tickUpdate() {
         refresh();
     }
+
+    @Override
+    public void draw(Graphics g) {
+
+    }
 }

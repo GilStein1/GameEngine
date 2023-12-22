@@ -8,12 +8,13 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public abstract class GSetup implements GSetups{
-
+    private boolean firstMethods;
     public int frameWidth = 900;
     public int frameHeight = 600;
     public double lastTime = System.currentTimeMillis();
@@ -30,6 +31,8 @@ public abstract class GSetup implements GSetups{
     private java.util.List<GFrameTextField> frameTextFields = new java.util.ArrayList<>();
     private java.util.List<GButton> gButtons = new java.util.ArrayList<>();
     private java.util.List<GTextField> gTextFields = new java.util.ArrayList<>();
+    private java.util.List<GTextView> textViews = new java.util.ArrayList<>();
+    private ArrayList<GComponent> componentsToPaintLast = new ArrayList<>();
     public Thread executed;
     public BufferedImage img;
     public Graphics2D graphics;
@@ -55,6 +58,7 @@ public abstract class GSetup implements GSetups{
     private int yScreen = 0;
 
     public GSetup() {
+        firstMethods = true;
 
         fpsArr = new double[100];
         Arrays.fill(fpsArr,0.0);
@@ -213,6 +217,7 @@ public abstract class GSetup implements GSetups{
                     }
 
                     execute();
+                    thingsToDrawLast();
                 }
 
                 SwingUtilities.invokeLater(() -> {
@@ -316,6 +321,21 @@ public abstract class GSetup implements GSetups{
 
             while(!end()) {
 
+                if(firstMethods) {
+                    firstMethods = false;
+                    for(Method method : getClass().getDeclaredMethods()) {
+                        if(method.isAnnotationPresent(DoAtStart.class)) {
+                            try {
+                                method.invoke(this);
+                            } catch (IllegalAccessException e) {
+                                throw new RuntimeException(e);
+                            } catch (InvocationTargetException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+                }
+
                 if(count == 100) {
 
                     fps = (double)count/countTime;
@@ -339,6 +359,29 @@ public abstract class GSetup implements GSetups{
         executed.start();
 
 
+    }
+    public void moveCanvas(int x, int y) {
+        frame.setLocation(x,y);
+    }
+    public void setCanvasX(int x){
+        frame.setLocation(x,frame.getY());
+    }
+    public void setCanvasY(int y){
+        frame.setLocation(frame.getX(),y);
+    }
+    public int getCanvasX() {
+        return frame.getX();
+    }
+    public int getCanvasY() {
+        return frame.getY();
+    }
+    private void thingsToDrawLast() {
+        for(GComponent component : componentsToPaintLast) {
+            component.draw(graphics);
+        }
+        for(GTextView textView : textViews) {
+            textView.draw(this);
+        }
     }
     /**
      * Draws an ellipse on the screen
@@ -521,7 +564,7 @@ public abstract class GSetup implements GSetups{
      * @param     button the GButton to be drawn
      */
     public void drawButton(GButton button) {
-        button.draw(graphics,xOnCanvas(),yOnCanvas());
+        button.draw(graphics);
     }
     /**
      *Draws a GTextField on the screen
@@ -529,6 +572,9 @@ public abstract class GSetup implements GSetups{
      */
     public void drawTextField(GTextField textField) {
         textField.draw(graphics);
+    }
+    public void drawGProgressBar(GProgressBar progressBar) {
+        progressBar.draw((GSetup) this);
     }
     /**
      *Adds a GFrameButton to the setup
@@ -552,6 +598,10 @@ public abstract class GSetup implements GSetups{
      */
     public void addGButton(GButton button) {
         gButtons.add(button);
+        if(button.getClass().isAnnotationPresent(PaintLast.class)) {
+//            System.out.println("yes");
+            componentsToPaintLast.add(button);
+        }
     }
     /**
      *Adds a GTextField to the setup
@@ -559,6 +609,10 @@ public abstract class GSetup implements GSetups{
      */
     public void addGTextField(GTextField textField) {
         gTextFields.add(textField);
+    }
+    public void addGTextView(GTextView textView) {
+        panel.add(textView.getTextArea());
+        textViews.add(textView);
     }
     public void mouseClickedFromOutSide() {
         if(!mouseOnFrame) {
@@ -733,6 +787,14 @@ public abstract class GSetup implements GSetups{
         JFileChooser fc = new JFileChooser();
         fc.showDialog(frame,approveButton);
         return fc.getSelectedFile().getAbsolutePath();
+    }
+    /**
+     * Shows the regular JFileChooser dialog
+     */
+    public String GFolderChooser(String approveButton) {
+        JFileChooser fc = new JFileChooser();
+        fc.showDialog(frame,approveButton);
+        return fc.getCurrentDirectory().getAbsolutePath();
     }
     /**
      * @return  the BufferedImage object of the GImage of the canvas
