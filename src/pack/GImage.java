@@ -12,6 +12,7 @@ public class GImage {
 
     private BufferedImage img;
     private Graphics graphics;
+    private GSetup.Smoothness smoothness = GSetup.Smoothness.NORMAL;
     private double angle = 0;
     public GImage(String path) {
 
@@ -26,6 +27,26 @@ public class GImage {
     public GImage(int width, int height) {
         img = new BufferedImage(width,height,BufferedImage.TYPE_INT_ARGB);
         graphics = img.createGraphics();
+    }
+    public void setSmoothness(GSetup.Smoothness smoothness) {
+        this.smoothness = smoothness;
+        updateSmoothness(smoothness,(Graphics2D) graphics);
+    }
+    void updateSmoothness(GSetup.Smoothness amount, Graphics2D graphics) {
+        switch (amount) {
+            case VERY_SMOOTH -> {
+                graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+                graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            }
+            case NORMAL -> {
+                graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_DEFAULT);
+                graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT);
+            }
+            case NOT_SMOOTH -> {
+                graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);
+                graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+            }
+        }
     }
     /**
      * @return the current angle (in degrees) of the GImage
@@ -114,7 +135,7 @@ public class GImage {
      * @param points the array of points of the polygon
      * @param color the color of the polygon
      */
-    public void drawPolygon(Vec2D[] points, Color color) {
+    public void drawPolygon(Color color, Vec2D... points) {
         int[] x = new int[points.length];
         int[] y = new int[points.length];
         for(int i = 0; i < points.length; i++) {
@@ -139,7 +160,7 @@ public class GImage {
      * @param points the array of points of the polygon
      * @param color the color of the polygon
      */
-    public void fillPolygon(Vec2D[] points, Color color) {
+    public void fillPolygon(Color color, Vec2D... points) {
         int[] x = new int[points.length];
         int[] y = new int[points.length];
         for(int i = 0; i < points.length; i++) {

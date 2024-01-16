@@ -19,6 +19,7 @@ public class GPanel implements GComponent {
     boolean selected = false;
     private SetupManager setupManager;
     private Color defaultBackground = new Color(238,238,238);
+    private boolean resizable = true;
 
     public GPanel(int x, int y, int width, int height, String title, GImage image) {
 
@@ -30,7 +31,7 @@ public class GPanel implements GComponent {
         panel = new JPanel() {
             @Override
             public void paintComponent(Graphics g) {
-                g.drawImage(image1.getImage(),0,0,width,height,null);
+                g.drawImage(image1.getImage(),0,0,frame.getWidth(),frame.getHeight(),null);
                 image1.fillRectangle(0,0,image1.getImage().getWidth(),image1.getImage().getHeight(),defaultBackground);
             }
         };
@@ -110,8 +111,13 @@ public class GPanel implements GComponent {
 
             }
         });
-
-
+    }
+    public void setResizable(boolean resizable) {
+        this.resizable = resizable;
+        frame.setResizable(resizable);
+    }
+    public boolean isResizable() {
+        return resizable;
     }
     public void setVisible(boolean visible) {
         frame.setVisible(visible && isAdded);

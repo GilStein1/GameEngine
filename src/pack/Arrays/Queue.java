@@ -10,6 +10,13 @@ public class Queue<T>
         this.first = null;
         this.last = null;
     }
+    public Queue(T... values) {
+        this.first = null;
+        this.last = null;
+        for(int i = 0; i < values.length; i++) {
+            insert(values[i]);
+        }
+    }
     public void insert(T x)
     {
         Node<T> temp = new Node<T>(x);

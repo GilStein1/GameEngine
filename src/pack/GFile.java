@@ -16,7 +16,7 @@ public class GFile {
         if(!file.exists()) {
             accidentallyCreatedNewFile = true;
             try {
-                System.out.println(file.createNewFile());
+                file.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

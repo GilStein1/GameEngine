@@ -46,6 +46,10 @@ public class AngryFlappy extends GSetup {
         failed = false;
         bird = new GImage("Bird.png");
         failedMessage = new GImage("fail-stamp-7.png");
+        int failedX = failedMessage.getWidth();
+        int failedY = failedMessage.getHeight();
+        failedMessage = new GImage(failedX/5,failedY/5);
+        failedMessage.drawImage(0,0,failedMessage.getWidth(),failedMessage.getHeight(),"fail-stamp-7.png");
         icon = new GImage(100,100);
         icon.fillEllipse(0,0,100,100,Color.BLACK);
         icon.fillEllipse(5,5,90,90,new Color(200,200,200));
