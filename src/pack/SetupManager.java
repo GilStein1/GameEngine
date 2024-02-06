@@ -2,7 +2,11 @@ package pack;
 
 import javax.swing.*;
 import java.awt.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class SetupManager {
 
@@ -13,7 +17,10 @@ public class SetupManager {
     private JPanel fpsPanel;
     private boolean showFpsGraph = false;
     private double[] fpsArr;
+    private Class<?> setupClass;
+    private HashMap<String, Object> valuesPool;
     private SetupManager() {
+        valuesPool = new HashMap<>();
         fps = new JFrame("fps graph");
         fps.setSize(412,260);
         fps.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -47,12 +54,50 @@ public class SetupManager {
         };
         fps.add(fpsPanel);
     }
-
     public static SetupManager getInstance() {
         if(instance == null) {
             instance = new SetupManager();
         }
         return instance;
+    }
+    public static boolean pushValueToPool(Object value, String name) {
+        boolean ret = instance.valuesPool.containsKey(name);
+        instance.valuesPool.put(name, value);
+        return ret;
+    }
+    public static Object pullFromPool(String name) {
+        if(instance.valuesPool.containsKey(name)) {
+            return instance.valuesPool.get(name);
+        }
+        else {
+            throw new RuntimeException("pulled value does not exist");
+        }
+    }
+    public static void moveToSetup(Class<?> setup) {
+        ((GSetup)(instance.getSetup())).stop();
+        startGame(setup);
+    }
+    public static GSetup startGame(Class<?> c) {
+        GSetup setup = null;
+        getInstance().setupClass = c;
+        try {
+            Constructor<?> con = c.getConstructor();
+            setup = (GSetup) con.newInstance();
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(e);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } catch (ClassCastException e) {
+            throw new RuntimeException("cannot start a class that is not a Setup");
+        }
+        return setup;
+    }
+    Class<?> getSetupClass() {
+        return setupClass;
     }
     public void setSetup(GSetups setup) {
         this.setup = setup;

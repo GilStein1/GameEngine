@@ -8,8 +8,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -58,12 +56,19 @@ public abstract class GSetup implements GSetups{
     private int yScreen = 0;
     private BufferedImage imgToDrawOn;
     private Graphics graphicsToDrawFrom;
-    private boolean loadShapedFaster = false;
+    boolean loadShapesFaster = false;
     private Smoothness smoothness;
+    private boolean continueRun;
 
     public GSetup() {
+
+        if(SetupManager.getInstance().getSetupClass() != this.getClass()) {
+            throw new RuntimeException("illegal use of the class");
+        }
+
         smoothness = Smoothness.NORMAL;
         firstMethods = true;
+        continueRun = true;
 
         fpsArr = new double[100];
         Arrays.fill(fpsArr,0.0);
@@ -74,6 +79,7 @@ public abstract class GSetup implements GSetups{
         manager.setSetup(this);
 
         frame = new JFrame();
+
         count = 0;
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
             @Override
@@ -198,7 +204,7 @@ public abstract class GSetup implements GSetups{
                 super.paintComponent(g);
 
                 g.drawImage(img,0,0,frame.getWidth(),frame.getHeight(),null);
-                if(!loadShapedFaster) {
+                if(!loadShapesFaster) {
 
                     timeCountForFps += deltaTime();
 
@@ -208,9 +214,12 @@ public abstract class GSetup implements GSetups{
 
                     if(!isPainting) {
 
-                        img = new BufferedImage(frame.getWidth(),frame.getHeight(),BufferedImage.TYPE_INT_ARGB);
+                        if(img == null || (img.getWidth() != frame.getWidth() || img.getHeight() != frame.getHeight())) {
+                            img = new BufferedImage(frame.getWidth(),frame.getHeight(),BufferedImage.TYPE_INT_ARGB);
+                        }
 
                         graphics = img.createGraphics();
+
                         updateSmoothness(smoothness,graphics);
 
                         if(font != null) {
@@ -257,7 +266,8 @@ public abstract class GSetup implements GSetups{
                     manager.reDraw();
 
                 }
-                if((true ||img.getWidth() != frame.getWidth() || img.getHeight() != frame.getHeight()) && loadShapedFaster) {
+                if((img.getWidth() != frame.getWidth() || img.getHeight() != frame.getHeight()) && loadShapesFaster) {
+//                    System.out.println("asdwasdw");
                     img = new BufferedImage(frame.getWidth(),frame.getHeight(),BufferedImage.TYPE_INT_ARGB);
                     imgToDrawOn = new BufferedImage(frame.getWidth(),frame.getHeight(),BufferedImage.TYPE_INT_ARGB);
                 }
@@ -335,21 +345,21 @@ public abstract class GSetup implements GSetups{
 
         executed = new Thread(() -> {
 
-            while(!end()) {
+            while(!end() && continueRun) {
 
                 if(firstMethods) {
                     firstMethods = false;
-                    for(Method method : getClass().getDeclaredMethods()) {
-                        if(method.isAnnotationPresent(DoAtStart.class)) {
-                            try {
-                                method.invoke(this);
-                            } catch (IllegalAccessException e) {
-                                throw new RuntimeException(e);
-                            } catch (InvocationTargetException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    }
+//                    for(Method method : getClass().getDeclaredMethods()) {
+//                        if(method.isAnnotationPresent(DoAtStart.class)) {
+//                            try {
+//                                method.invoke(this);
+//                            } catch (IllegalAccessException e) {
+//                                throw new RuntimeException(e);
+//                            } catch (InvocationTargetException e) {
+//                                throw new RuntimeException(e);
+//                            }
+//                        }
+//                    }
                 }
 
                 if(count == 100) {
@@ -362,7 +372,7 @@ public abstract class GSetup implements GSetups{
                     countTime = 0.0;
 
                 }
-                if(loadShapedFaster) {
+                if(loadShapesFaster) {
 //                    updateSmoothness(smoothness,graphics);
                     updateFrame();
                 }
@@ -379,8 +389,9 @@ public abstract class GSetup implements GSetups{
 
 
     }
-    public void loadShapedFaster(boolean drawFaster) {
-        this.loadShapedFaster = drawFaster;
+    public GSetup loadShapesFaster(boolean drawFaster) {
+        this.loadShapesFaster = drawFaster;
+        return this;
     }
     private void updateFrame() {
         timeCountForFps += deltaTime();
@@ -439,6 +450,13 @@ public abstract class GSetup implements GSetups{
             fpsArr[fpsArr.length - 1] = currentFPS();
         }
         manager.reDraw();
+    }
+    void stop() {
+        continueRun = false;
+//        frame.dispose();
+//        for(GPanel panel : panels) {
+//            panel.setVisible(false);
+//        }
     }
     public void moveCanvas(int x, int y) {
         frame.setLocation(x,y);
@@ -832,24 +850,33 @@ public abstract class GSetup implements GSetups{
      */
     public GFile loadFile(String... path) {
 
-        String p = "";
+        if(path.length != 1) {
+            String p = "";
 
-        String name = path[path.length-1];
+            String name = path[path.length-1];
 
-        for(int i = 0; i < path.length - 1; i++) {
-            p += path[i] + "/";
-        }
+            for(int i = 0; i < path.length - 1; i++) {
+                p += path[i] + "/";
+            }
 
-        File f = new File(p.substring(0,p.length()-1));
+            File f = new File(p.substring(0,p.length()-1));
 
-        if(!f.exists()) {
-            f.mkdir();
-        }
-        f = new File(p + name);
+            if(!f.exists()) {
+                f.mkdir();
+            }
+            f = new File(p + name);
 
 //        System.out.println(f.getPath());
 
-        return new GFile(f);
+            return new GFile(f);
+        }
+        else {
+            File f = new File(path[0]);
+            if(!f.exists()) {
+                f.mkdir();
+            }
+            return  new GFile(f);
+        }
     }
 //    public GFile loadFile(String path, String name) {
 //        File f = new File(path);
@@ -1039,5 +1066,20 @@ public abstract class GSetup implements GSetups{
      */
     public double currentFPS() {
         return fps;
+    }
+    public void addKeyListener(KeyListener keyListener) {
+        frame.addKeyListener(keyListener);
+    }
+    public void addMouseListener(MouseListener mouseListener) {
+        frame.addMouseListener(mouseListener);
+    }
+    public void addWindowListener(WindowListener windowListener) {
+        frame.addWindowListener(windowListener);
+    }
+    public void addMouseMotionListener(MouseMotionListener mouseMotionListener) {
+        frame.addMouseMotionListener(mouseMotionListener);
+    }
+    public void addMouseWheelListener(MouseWheelListener mouseWheelListener) {
+        frame.addMouseWheelListener(mouseWheelListener);
     }
 }

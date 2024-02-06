@@ -35,7 +35,7 @@ public class AngryFlappy extends GSetup {
     public void initialize() {
         keepScore = loadFileInGSetupResources("Scores.txt");
         if(!keepScore.accidentallyCreatedNewFile()) {
-            bestScore = Integer.parseInt(keepScore.read());
+            bestScore = Integer.parseInt(keepScore.read(),16);
 //            System.out.println(keepScore.read());
 //            bestScore = 0;
         }
@@ -183,7 +183,7 @@ public class AngryFlappy extends GSetup {
     }
     @Override
     public void lastFunction() {
-        keepScore.print(String.valueOf(bestScore));
+        keepScore.print(Integer.toHexString(bestScore));
         keepScore.stopWriting();
 //        System.out.println(String.valueOf(bestScore));
     }

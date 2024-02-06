@@ -11,7 +11,7 @@ import java.io.IOException;
 public class GImage {
 
     private BufferedImage img;
-    private Graphics graphics;
+    private Graphics2D graphics;
     private GSetup.Smoothness smoothness = GSetup.Smoothness.NORMAL;
     private double angle = 0;
     public GImage(String path) {
@@ -47,6 +47,10 @@ public class GImage {
                 graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
             }
         }
+    }
+    public void setToEraser(boolean eraser) {
+        graphics.setColor(Color.BLACK);
+        graphics.setComposite(eraser? AlphaComposite.Clear : AlphaComposite.SrcOver);
     }
     /**
      * @return the current angle (in degrees) of the GImage

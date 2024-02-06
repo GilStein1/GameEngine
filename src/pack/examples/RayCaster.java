@@ -22,8 +22,16 @@ public class RayCaster extends GSetup {
 
     @Override
     public void initialize() {
-        entityTexture = new GImage("Bird With Shadow.png");
-        texture = new GImage("BrickWall.png");
+
+//        entityTexture = new GImage("Bird With Shadow.png");
+//        texture = new GImage("BrickWall.png");
+
+        entityTexture = new GImage(200,200);
+        entityTexture.drawImage(0,0,200,200,new GImage("Bird With Shadow.png"));
+
+        texture = new GImage(200,200);
+        texture.drawImage(0,0,200,200,new GImage("BrickWall.png"));
+
         render = new GImage(1, texture.getHeight());
         screenWidth = 600;
         screenHeight = 600;
@@ -35,13 +43,15 @@ public class RayCaster extends GSetup {
         panel.setVisible(true);
         rot = 0.01;
         setFrameSize(screenWidth,screenHeight);
-        setResizable(false);
+        setResizable(true);
         setBackground(Color.BLACK);
 
         setSmoothness(Smoothness.VERY_SMOOTH);
 
         img.setSmoothness(Smoothness.VERY_SMOOTH);
         render.setSmoothness(Smoothness.VERY_SMOOTH);
+
+        loadShapesFaster(true);
 
         points = new Vec2D[200];
         entities = new Vec2D[4];
@@ -124,7 +134,7 @@ public class RayCaster extends GSetup {
 
         int count = 0;
 
-        for(double j = rot2; j < (Math.PI/3.0) + rot2; j+= 0.002) {
+        for(double j = rot2; j < (Math.PI/3.0) + rot2; j+= 0.004) {
             Vec2D point = new Vec2D(1000*Math.cos(j) + light.x,1000*Math.sin(j) + light.y);
             point.x = 1000*Math.cos(j) + light.x;
             point.y = 1000*Math.sin(j) + light.y;
