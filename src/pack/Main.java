@@ -1,37 +1,31 @@
 package pack;
 
-import pack.examples.Test;
+import pack.examples.*;
 
+import javax.swing.*;
 import java.awt.*;
 
 public class Main extends GSetup{
+
     public static void main(String[] args) {
-        SetupManager.startGame(Main.class);
+        SetupManager.Debug.runFullScreen(false);
+        SetupManager.startGame(BallGameWithSprings.class);
+//        SetupManager.Debug.fpsGraph();
     }
-    GButton b;
-    GTextField tf;
-    GProgressBar pr;
+
+    GImage bird;
 
     @Override
     public void initialize() {
-        pr = new GProgressBar(0,100,200,50,Color.GREEN);
-        pr.setAngle(45);
-        b = new GButton(100,100,100,100, Color.GREEN);
-        tf = new GTextField(400,400,200,40,Color.GRAY);
-        addGTextField(tf);
+        bird = new GImage("Bird.png");
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        loadShapesFaster(true);
+        SetupManager.Debug.fpsGraph();
     }
 
     @Override
     public void execute() {
-
-        pr.setProgress(xOnCanvas()/200.0);
-        drawTextField(tf);
-        drawButton(b);
-        drawGProgressBar(pr);
-        if(b.isPressed()) {
-            System.out.println(SetupManager.pushValueToPool(tf.getText(),"val"));
-            SetupManager.moveToSetup(Test.class);
-        }
+        drawImage(xOnCanvas()-50,yOnCanvas()-50,100,100,bird);
     }
 
     @Override

@@ -14,9 +14,9 @@ public class GFile {
     GFile(File file) {
         this.file = file;
         if(!file.exists()) {
-            accidentallyCreatedNewFile = true;
+//            accidentallyCreatedNewFile = true;
             try {
-                file.createNewFile();
+                accidentallyCreatedNewFile = file.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

@@ -75,7 +75,7 @@ public class GImage {
         graphics = img.createGraphics();
         graphics.drawImage(image.getImage(),0,0, img.getWidth(), img.getHeight(),null);
     }
-    public Graphics getGraphics() {
+    public Graphics2D getGraphics() {
         return graphics;
     }
     /**

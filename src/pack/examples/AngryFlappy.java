@@ -33,6 +33,7 @@ public class AngryFlappy extends GSetup {
     int bestScore;
     @Override
     public void initialize() {
+//        setFullScreen(true);
         keepScore = loadFileInGSetupResources("Scores.txt");
         if(!keepScore.accidentallyCreatedNewFile()) {
             bestScore = Integer.parseInt(keepScore.read(),16);

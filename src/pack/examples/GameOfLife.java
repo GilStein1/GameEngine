@@ -27,7 +27,7 @@ public class GameOfLife extends GSetup {
 
     @Override
     public void initialize() {
-        SetupManager.Debug.fpsGraph();
+//        SetupManager.Debug.fpsGraph();
         setFrameSize(900,900);
         setResizable(false);
         setTitle("Game Of Life");

@@ -61,13 +61,13 @@ public class SetupManager {
         return instance;
     }
     public static boolean pushValueToPool(Object value, String name) {
-        boolean ret = instance.valuesPool.containsKey(name);
+        boolean ret = getInstance().valuesPool.containsKey(name);
         instance.valuesPool.put(name, value);
         return ret;
     }
     public static Object pullFromPool(String name) {
-        if(instance.valuesPool.containsKey(name)) {
-            return instance.valuesPool.get(name);
+        if(getInstance().valuesPool.containsKey(name)) {
+            return getInstance().valuesPool.get(name);
         }
         else {
             throw new RuntimeException("pulled value does not exist");
@@ -124,14 +124,17 @@ public class SetupManager {
         return setup;
     }
     public static class Debug {
-
+        private static boolean runFullScreen = false;
         public static void fpsGraph() {
-
             instance.showFpsGraph(true);
             instance.getFpsFrame().setVisible(true);
-
+        }
+        public static void runFullScreen(boolean fullScreen) {
+            runFullScreen = fullScreen;
+        }
+        public static boolean runFullScreen() {
+            return runFullScreen;
         }
 
     }
-
 }

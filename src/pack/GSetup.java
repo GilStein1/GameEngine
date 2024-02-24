@@ -59,8 +59,15 @@ public abstract class GSetup implements GSetups{
     boolean loadShapesFaster = false;
     private Smoothness smoothness;
     private boolean continueRun;
+    private int extendedState;
+    private boolean doFullScreen;
+    private boolean hasInitialized;
 
     public GSetup() {
+
+        hasInitialized = false;
+
+        doFullScreen = SetupManager.Debug.runFullScreen();
 
         if(SetupManager.getInstance().getSetupClass() != this.getClass()) {
             throw new RuntimeException("illegal use of the class");
@@ -119,46 +126,6 @@ public abstract class GSetup implements GSetups{
             }
         });
 
-//        frame.addKeyListener(new KeyListener() {
-//            @Override
-//            public void keyTyped(KeyEvent e) {
-////                if(keyTyped != null) {
-//////                    keyTyped.action(e);
-////                    keyEventsPairs.insert(new KeyAndActionPair(keyTyped,e));
-////
-////                }
-////                for(GTextField t : gTextFields) {
-////                    t.typed(e,lastKeyPressed == KeyEvent.VK_BACK_SPACE);
-////                }
-//            }
-//
-//            @Override
-//            public void keyPressed(KeyEvent e) {
-////                System.out.println(e.getKeyCode());
-////                lastKeyPressed = e.getKeyCode();
-////                if(keyPressed != null) {
-//////                    keyPressed.action(e);
-////                    keyEventsPairs.insert(new KeyAndActionPair(keyPressed,e));
-////                }
-////                lastCharPressed = e.getKeyChar();
-//            }
-//
-//            @Override
-//            public void keyReleased(KeyEvent e) {
-//
-////                if(e.getKeyCode() == lastKeyPressed) {
-////                    lastKeyPressed = -1;
-////                }
-////                if(keyReleased != null) {
-//////                    keyReleased.action(e);
-////                    keyEventsPairs.insert(new KeyAndActionPair(keyReleased,e));
-////                }
-////                if(e.getKeyChar() == lastCharPressed) {
-////                    lastCharPressed = '~';
-////                }
-//            }
-//        });
-
         frame.addWindowListener(new WindowListener() {
             @Override
             public void windowOpened(WindowEvent e) {
@@ -204,6 +171,12 @@ public abstract class GSetup implements GSetups{
                 super.paintComponent(g);
 
                 g.drawImage(img,0,0,frame.getWidth(),frame.getHeight(),null);
+                if(img != null && !loadShapesFaster) {
+                    Graphics2D g2 = img.createGraphics();
+                    g2.setColor(defaultBackground);
+                    g2.fillRect(0,0,frame.getWidth(),frame.getHeight());
+                    g2.dispose();
+                }
                 if(!loadShapesFaster) {
 
                     timeCountForFps += deltaTime();
@@ -276,7 +249,14 @@ public abstract class GSetup implements GSetups{
 
         panel.setLayout(null);
 
+        extendedState = JFrame.NORMAL;
+
         initialize();
+
+        if(doFullScreen) {
+            frame.setUndecorated(true);
+            frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        }
 
         frame.setTitle(title);
         panel.setBackground(defaultBackground);
@@ -285,6 +265,7 @@ public abstract class GSetup implements GSetups{
         frame.setVisible(true);
         frame.setResizable(resize);
         frame.add(panel);
+        hasInitialized = true;
 
         frame.addMouseListener(new MouseListener() {
             @Override
@@ -365,6 +346,9 @@ public abstract class GSetup implements GSetups{
                 if(count == 100) {
 
                     fps = (double)count/countTime;
+                    if(fps == 1.0/0) {
+                        fps = 0;
+                    }
 
 //                    System.out.println(fps);
 
@@ -395,6 +379,13 @@ public abstract class GSetup implements GSetups{
     }
     private void updateFrame() {
         timeCountForFps += deltaTime();
+
+        if(imgToDrawOn != null) {
+            Graphics2D g2 = imgToDrawOn.createGraphics();
+            g2.setColor(defaultBackground);
+            g2.fillRect(0,0,frame.getWidth(),frame.getHeight());
+            g2.dispose();
+        }
 
         if(!isPainting) {
 
@@ -456,6 +447,23 @@ public abstract class GSetup implements GSetups{
 //        frame.dispose();
 //        for(GPanel panel : panels) {
 //            panel.setVisible(false);
+//        }
+    }
+    public GSetup setExtendedState(int state) {
+        this.extendedState = state;
+        frame.setExtendedState(state);
+        return this;
+    }
+    public void setFullScreen(boolean fullScreen) {
+        doFullScreen = fullScreen;
+//        if(hasInitialized) {
+//            boolean visible = frame.isVisible();
+//            frame.setVisible(false);
+//            frame.setUndecorated(fullScreen);
+//            frame.setVisible(visible);
+//            if(fullScreen && visible) {
+//                frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+//            }
 //        }
     }
     public void moveCanvas(int x, int y) {
@@ -893,26 +901,6 @@ public abstract class GSetup implements GSetups{
      * If the given file name does not already exist in the GSetup resources directory, it will create a new file in that name
      * @param     name the name of the file
      */
-//    public GFile loadFileInGSetupResources(String name) {
-//
-//        File f = new File(getPath() + "/GSetup");
-//
-//        if(!f.exists()) {
-//            f.mkdir();
-//        }
-//        String s = getClass().getName();
-//        s = s.split("\\.")[s.split("\\.").length - 1];
-//        f = new File(getPath() + "/GSetup/" + s);
-//        if(!f.exists()) {
-//            f.mkdir();
-//        }
-//        f = new File(getPath() + "\\GSetup\\" + s + "\\" + name);
-//
-////        System.out.println(f.exists());
-//
-////        System.out.println(getPath() + "\\GSetup\\" + s + "\\" + name);
-//        return new GFile(f);
-//    }
     public GFile loadFileInGSetupResources(String... name) {
 
         String folder = "";
