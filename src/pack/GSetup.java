@@ -64,6 +64,8 @@ public abstract class GSetup implements GSetups{
     private boolean hasInitialized;
     private int limitedFps;
     private Robot robot;
+    private int cursorXOffset = 0;
+    private int cursorYOffset = 0;
 
     public GSetup() {
         try {
@@ -220,8 +222,8 @@ public abstract class GSetup implements GSetups{
                             currentTime = Math.abs(System.nanoTime())/1000000.0;
                         }
 
-                        xScreen = (int)MouseInfo.getPointerInfo().getLocation().getX() - 8;
-                        yScreen = (int)MouseInfo.getPointerInfo().getLocation().getY() - 31;
+                        xScreen = (int)MouseInfo.getPointerInfo().getLocation().getX() - 8 + cursorXOffset;
+                        yScreen = (int)MouseInfo.getPointerInfo().getLocation().getY() - 31 + cursorYOffset;
 
                         while (!keyEventsPairs.isEmpty()){
                             KeyAndActionPair pair = keyEventsPairs.remove();
@@ -451,8 +453,8 @@ public abstract class GSetup implements GSetups{
 ////            currentTime = System.currentTimeMillis();
 //            currentTime = Math.abs(System.nanoTime())/1000000.0;
 
-            xScreen = (int)MouseInfo.getPointerInfo().getLocation().getX() - 8;
-            yScreen = (int)MouseInfo.getPointerInfo().getLocation().getY() - 31;
+            xScreen = (int)MouseInfo.getPointerInfo().getLocation().getX() - 8 + cursorXOffset;
+            yScreen = (int)MouseInfo.getPointerInfo().getLocation().getY() - 31 + cursorYOffset;
 
             while (!keyEventsPairs.isEmpty()){
                 KeyAndActionPair pair = keyEventsPairs.remove();
@@ -852,6 +854,30 @@ public abstract class GSetup implements GSetups{
         if(frame != null) {
             frame.setIconImage(frameIcon);
         }
+    }
+    /**
+     * Sets an image for the cursor
+     * @param     path the path to the image in project's resources
+     */
+    public void setCursorImage(String path) {
+        frame.getContentPane().setCursor(Toolkit.getDefaultToolkit().createCustomCursor(new GImage(path).getImage(), new Point(0, 0), path));
+    }
+    /**
+     * Sets an image for the cursor
+     * @param     image the image for the cursor
+     */
+    public void setCursorImage(GImage image) {
+        frame.getContentPane().setCursor(Toolkit.getDefaultToolkit().createCustomCursor(image.getImage(), new Point(0, 0), "cursor"));
+    }
+    /**
+     * Sets an offset for the cursor
+     * (note that this does not affect GFrameButtons and GFrameTextFields)
+     * @param     x the offset in the x-axis
+     * @param     y the offset in the y-axis
+     */
+    public void setCursorOffset(int x, int y) {
+        this.cursorXOffset = x;
+        this.cursorYOffset = y;
     }
     /**
      * Sets a new font
