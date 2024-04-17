@@ -62,8 +62,17 @@ public abstract class GSetup implements GSetups{
     private int extendedState;
     private boolean doFullScreen;
     private boolean hasInitialized;
+    private int limitedFps;
+    private Robot robot;
 
     public GSetup() {
+        try {
+            robot = new Robot();
+        } catch (AWTException e) {
+            throw new RuntimeException(e);
+        }
+
+        limitedFps = -1;
 
         hasInitialized = false;
 
@@ -170,6 +179,10 @@ public abstract class GSetup implements GSetups{
             public void paintComponent(Graphics g) {
                 super.paintComponent(g);
 
+//                Graphics2D g = (Graphics2D) g1;
+//
+//                g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+
                 g.drawImage(img,0,0,frame.getWidth(),frame.getHeight(),null);
                 if(img != null && !loadShapesFaster) {
                     Graphics2D g2 = img.createGraphics();
@@ -193,13 +206,19 @@ public abstract class GSetup implements GSetups{
 
                         graphics = img.createGraphics();
 
+//                        graphics.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+
                         updateSmoothness(smoothness,graphics);
 
                         if(font != null) {
                             graphics.setFont(font);
                         }
-                        lastTime = currentTime;
-                        currentTime = System.currentTimeMillis();
+//                        System.out.println("Yay");
+                        if(limitedFps == -1) {
+                            lastTime = currentTime;
+//                            currentTime = System.currentTimeMillis();
+                            currentTime = Math.abs(System.nanoTime())/1000000.0;
+                        }
 
                         xScreen = (int)MouseInfo.getPointerInfo().getLocation().getX() - 8;
                         yScreen = (int)MouseInfo.getPointerInfo().getLocation().getY() - 31;
@@ -342,27 +361,53 @@ public abstract class GSetup implements GSetups{
 //                        }
 //                    }
                 }
+//                System.out.println(deltaTime());
 
-                if(count == 100) {
-
-                    fps = (double)count/countTime;
-                    if(fps == 1.0/0) {
-                        fps = 0;
+                if(limitedFps != -1) {
+                    if(countTime > 1.0/limitedFps) {
+                        fps = 1.0/countTime;
+                        if(fps == 1.0/0) {
+                            fps = 0;
+                        }
+                        countTime = 0;
+                        if(loadShapesFaster) {
+//                    updateSmoothness(smoothness,graphics);
+                            updateFrame();
+                        }
+                        panel.repaint();
                     }
+                    lastTime = currentTime;
+//                        currentTime = System.currentTimeMillis();
+                    currentTime = Math.abs(System.nanoTime())/1000000.0;
+
+//                    System.out.println(Math.abs(currentTime-lastTime));
+                }
+                else {
+                    if(count == 100) {
+
+                        fps = (double)count/countTime;
+                        if(fps == 1.0/0) {
+                            fps = 0;
+                        }
 
 //                    System.out.println(fps);
 
-                    count = 0;
-                    countTime = 0.0;
+                        count = 0;
+                        countTime = 0.0;
 
-                }
-                if(loadShapesFaster) {
+                    }
+                    if(loadShapesFaster) {
 //                    updateSmoothness(smoothness,graphics);
-                    updateFrame();
+                        lastTime = currentTime;
+//                        currentTime = System.currentTimeMillis();
+                        currentTime = Math.abs(System.nanoTime())/1000000.0;
+                        updateFrame();
+                    }
+                    panel.repaint();
+                    count++;
                 }
-                panel.repaint();
-                count++;
-                countTime += (double)deltaTime();
+//                System.out.println(deltaTime());
+                countTime += deltaTime();
 
             }
             frame.dispose();
@@ -382,6 +427,7 @@ public abstract class GSetup implements GSetups{
 
         if(imgToDrawOn != null) {
             Graphics2D g2 = imgToDrawOn.createGraphics();
+//            g2.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
             g2.setColor(defaultBackground);
             g2.fillRect(0,0,frame.getWidth(),frame.getHeight());
             g2.dispose();
@@ -396,12 +442,14 @@ public abstract class GSetup implements GSetups{
 
             graphicsToDrawFrom = img.createGraphics();
             graphics = imgToDrawOn.createGraphics();
+//            graphics.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
 
             if(font != null) {
                 graphics.setFont(font);
             }
-            lastTime = currentTime;
-            currentTime = System.currentTimeMillis();
+//            lastTime = currentTime;
+////            currentTime = System.currentTimeMillis();
+//            currentTime = Math.abs(System.nanoTime())/1000000.0;
 
             xScreen = (int)MouseInfo.getPointerInfo().getLocation().getX() - 8;
             yScreen = (int)MouseInfo.getPointerInfo().getLocation().getY() - 31;
@@ -449,6 +497,9 @@ public abstract class GSetup implements GSetups{
 //            panel.setVisible(false);
 //        }
     }
+    public void setLimitedFps(int fps) {
+        this.limitedFps = fps;
+    }
     public GSetup setExtendedState(int state) {
         this.extendedState = state;
         frame.setExtendedState(state);
@@ -480,6 +531,12 @@ public abstract class GSetup implements GSetups{
     }
     public int getCanvasY() {
         return frame.getY();
+    }
+    public GImage getScreenShot(int x, int y, int width, int height) {
+        return new GImage(robot.createScreenCapture(new Rectangle(x,y,width,height)));
+    }
+    public JFrame getFrame() {
+        return frame;
     }
     private void thingsToDrawLast() {
         for(GComponent component : componentsToPaintLast) {
@@ -841,8 +898,8 @@ public abstract class GSetup implements GSetups{
      * @return the time passed since the last frame in seconds
      */
     public double deltaTime() {
-        return ((currentTime - lastTime)/1000 < 1000000000 && (currentTime - lastTime)/1000 > 0)? (currentTime - lastTime)/1000 : 0;
-//        return (currentTime - lastTime)/1000;
+        return (Math.abs(currentTime - lastTime)/1000 < 100000 && Math.abs(currentTime - lastTime)/1000 > 0)? Math.abs(currentTime - lastTime)/1000 : 0;
+//        return Math.abs(currentTime - lastTime)/1000;
     }
     /**
      * Shows the regular JColorChooser dialog
@@ -874,8 +931,6 @@ public abstract class GSetup implements GSetups{
             }
             f = new File(p + name);
 
-//        System.out.println(f.getPath());
-
             return new GFile(f);
         }
         else {
@@ -886,16 +941,6 @@ public abstract class GSetup implements GSetups{
             return  new GFile(f);
         }
     }
-//    public GFile loadFile(String path, String name) {
-//        File f = new File(path);
-//
-//        if(!f.exists()) {
-//            f.mkdir();
-//        }
-//        f = new File(path + "/" + name);
-//
-//        return new GFile(f);
-//    }
     /**
      * Creates a new GFile object in the GSetup resources directory.
      * If the given file name does not already exist in the GSetup resources directory, it will create a new file in that name
@@ -908,38 +953,38 @@ public abstract class GSetup implements GSetups{
             folder += name[i] + "/";
         }
 
-        File f = new File(getPath() + "/" + folder + "/GSetup");
+        File f = new File(System.getenv("APPDATA") + "/" + folder + "/GSetup");
 
         if(!f.exists()) {
             f.mkdir();
         }
         String s = getClass().getName();
         s = s.split("\\.")[s.split("\\.").length - 1];
-        f = new File(getPath() + "/GSetup/" + s + "/" + folder);
+        f = new File(System.getenv("APPDATA") + "/GSetup/" + s + "/" + folder);
         if(!f.exists()) {
             f.mkdirs();
         }
-        f = new File(getPath() + "\\" + "\\GSetup\\" + s + "\\" + folder + "\\" +  name[name.length-1]);
+        f = new File(System.getenv("APPDATA") + "\\" + "\\GSetup\\" + s + "\\" + folder + "\\" +  name[name.length-1]);
 
         return new GFile(f);
     }
-    public GFile loadFileInGSetupResources(String folder ,String name) {
-
-        File f = new File(getPath() + "/" + folder + "/GSetup");
-
-        if(!f.exists()) {
-            f.mkdir();
-        }
-        String s = getClass().getName();
-        s = s.split("\\.")[s.split("\\.").length - 1];
-        f = new File(getPath() + "/GSetup/" + s + "/" + folder);
-        if(!f.exists()) {
-            f.mkdirs();
-        }
-        f = new File(getPath() + "\\" + "\\GSetup\\" + s + "\\" + folder + "\\" +  name);
-
-        return new GFile(f);
-    }
+//    public GFile loadFileInGSetupResources(String folder ,String name) {
+//
+//        File f = new File(getPath() + "/" + folder + "/GSetup");
+//
+//        if(!f.exists()) {
+//            f.mkdir();
+//        }
+//        String s = getClass().getName();
+//        s = s.split("\\.")[s.split("\\.").length - 1];
+//        f = new File(getPath() + "/GSetup/" + s + "/" + folder);
+//        if(!f.exists()) {
+//            f.mkdirs();
+//        }
+//        f = new File(getPath() + "\\" + "\\GSetup\\" + s + "\\" + folder + "\\" +  name);
+//
+//        return new GFile(f);
+//    }
     /**
      * Creates a new GImage object from an image file.
      * @param     path the path to the image file
