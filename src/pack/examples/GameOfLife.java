@@ -128,11 +128,6 @@ public class GameOfLife extends GSetup {
 
     }
 
-    @Override
-    public void lastFunction() {
-
-    }
-
     public void randomize() {
         for(int i = 0; i < arr1.length; i++) {
             for(int j = 0; j < arr1[i].length; j++) {

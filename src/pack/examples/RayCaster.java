@@ -254,11 +254,6 @@ public class RayCaster extends GSetup {
     }
 
     @Override
-    public void lastFunction() {
-
-    }
-
-    @Override
     public boolean end() {
         return fs && exit.isPressed();
     }

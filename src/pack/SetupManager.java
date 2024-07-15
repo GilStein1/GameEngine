@@ -12,7 +12,7 @@ public class SetupManager {
 
     private static SetupManager instance;
     private static ArrayList<GComponent> tickCalls = new ArrayList<>();
-    private GSetups setup;
+    private GSetup setup;
     private JFrame fps;
     private JPanel fpsPanel;
     private boolean showFpsGraph = false;
@@ -99,7 +99,7 @@ public class SetupManager {
     Class<?> getSetupClass() {
         return setupClass;
     }
-    public void setSetup(GSetups setup) {
+    public void setSetup(GSetup setup) {
         this.setup = setup;
         fpsArr = setup.getFpsArr();
     }
@@ -120,7 +120,7 @@ public class SetupManager {
     void showFpsGraph(boolean is) {
         showFpsGraph = is;
     }
-    GSetups getSetup() {
+    GSetup getSetup() {
         return setup;
     }
     public static class Debug {

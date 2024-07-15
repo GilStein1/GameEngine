@@ -11,7 +11,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public abstract class GSetup implements GSetups{
+public abstract class GSetup{
     private boolean firstMethods;
     public int frameWidth = 900;
     public int frameHeight = 600;
@@ -21,24 +21,22 @@ public abstract class GSetup implements GSetups{
     private boolean mouseOnFrame = true;
     private boolean isPainting;
     public String title = "";
-    private JFrame frame;
-    private SetupManager manager;
-    private JPanel panel;
-    private java.util.List<GPanel> panels = new java.util.ArrayList<>();
-    private java.util.List<GFrameButton> buttons = new java.util.ArrayList<>();
-    private java.util.List<GFrameTextField> frameTextFields = new java.util.ArrayList<>();
-    private java.util.List<GButton> gButtons = new java.util.ArrayList<>();
-    private java.util.List<GTextField> gTextFields = new java.util.ArrayList<>();
-    private java.util.List<GTextView> textViews = new java.util.ArrayList<>();
-    private ArrayList<GComponent> componentsToPaintLast = new ArrayList<>();
+    private final JFrame frame;
+    private final SetupManager manager;
+    private final JPanel panel;
+    private final java.util.List<GPanel> panels = new java.util.ArrayList<>();
+    private final java.util.List<GFrameButton> buttons = new java.util.ArrayList<>();
+    private final java.util.List<GFrameTextField> frameTextFields = new java.util.ArrayList<>();
+    private final java.util.List<GButton> gButtons = new java.util.ArrayList<>();
+    private final java.util.List<GTextField> gTextFields = new java.util.ArrayList<>();
+    private final java.util.List<GTextView> textViews = new java.util.ArrayList<>();
+    private final ArrayList<GComponent> componentsToPaintLast = new ArrayList<>();
     public Thread executed;
     public BufferedImage img;
     public Graphics2D graphics;
     private BufferedImage frameIcon;
-    private Point mousePos = MouseInfo.getPointerInfo().getLocation();
     public Color defaultBackground = new Color(238,238,238);
     public Font font;
-    private boolean updateFont = false;
     private int count;
     private double timeCountForFps = 0;
     private double countTime = 0;
@@ -66,6 +64,30 @@ public abstract class GSetup implements GSetups{
     private Robot robot;
     private int cursorXOffset = 0;
     private int cursorYOffset = 0;
+
+    /**
+     * The first method to run at the beginning of the program.
+     * The initialize method is used to initialize values and parameters
+     */
+    public abstract void initialize();
+    /**
+     * The method to be executed repeatedly as long as the program is running (runs on a separate thread).
+     * At the end of each cycle, the frame is being drawn.
+     * At the start of each cycle, the deltaTime and currentFPS values are updated.
+     */
+    public abstract void execute();
+    /**
+     * The method to run at the end of the program, is called when the frame's WindowListener detects the window is being closed.
+     */
+    public void lastFunction() {
+
+    }
+    /**
+     * The method to decide when the program should end
+     * @return the value that decides if the program should stop running.
+     */
+    public abstract boolean end();
+
 
     public GSetup() {
         try {
@@ -429,7 +451,6 @@ public abstract class GSetup implements GSetups{
 
         if(imgToDrawOn != null) {
             Graphics2D g2 = imgToDrawOn.createGraphics();
-//            g2.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
             g2.setColor(defaultBackground);
             g2.fillRect(0,0,frame.getWidth(),frame.getHeight());
             g2.dispose();
@@ -444,14 +465,10 @@ public abstract class GSetup implements GSetups{
 
             graphicsToDrawFrom = img.createGraphics();
             graphics = imgToDrawOn.createGraphics();
-//            graphics.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
 
             if(font != null) {
                 graphics.setFont(font);
             }
-//            lastTime = currentTime;
-////            currentTime = System.currentTimeMillis();
-//            currentTime = Math.abs(System.nanoTime())/1000000.0;
 
             xScreen = (int)MouseInfo.getPointerInfo().getLocation().getX() - 8 + cursorXOffset;
             yScreen = (int)MouseInfo.getPointerInfo().getLocation().getY() - 31 + cursorYOffset;
@@ -481,7 +498,6 @@ public abstract class GSetup implements GSetups{
             isPainting = false;
         }
         graphicsToDrawFrom.dispose();
-//                System.out.println(timeCountForFps);
         if(timeCountForFps > 0.25) {
 
             timeCountForFps = 0;
@@ -494,10 +510,6 @@ public abstract class GSetup implements GSetups{
     }
     void stop() {
         continueRun = false;
-//        frame.dispose();
-//        for(GPanel panel : panels) {
-//            panel.setVisible(false);
-//        }
     }
     public void setLimitedFps(int fps) {
         this.limitedFps = fps;
@@ -509,15 +521,6 @@ public abstract class GSetup implements GSetups{
     }
     public void setFullScreen(boolean fullScreen) {
         doFullScreen = fullScreen;
-//        if(hasInitialized) {
-//            boolean visible = frame.isVisible();
-//            frame.setVisible(false);
-//            frame.setUndecorated(fullScreen);
-//            frame.setVisible(visible);
-//            if(fullScreen && visible) {
-//                frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-//            }
-//        }
     }
     public void moveCanvas(int x, int y) {
         frame.setLocation(x,y);
@@ -885,7 +888,6 @@ public abstract class GSetup implements GSetups{
      */
     public void setFont(Font font) {
         this.font = font;
-        updateFont = true;
     }
     /**
      * Sets new dimensions for the screen

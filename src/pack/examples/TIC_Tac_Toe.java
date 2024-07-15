@@ -98,11 +98,6 @@ public class TIC_Tac_Toe extends GSetup {
     }
 
     @Override
-    public void lastFunction() {
-
-    }
-
-    @Override
     public boolean end() {
 
         return (time > -1 && System.currentTimeMillis() - time > 5000);

@@ -65,11 +65,6 @@ public class ScreenIsMoving extends GSetup {
     }
 
     @Override
-    public void lastFunction() {
-
-    }
-
-    @Override
     public boolean end() {
         return false;
     }
