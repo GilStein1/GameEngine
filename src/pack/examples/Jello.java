@@ -140,10 +140,12 @@ public class Jello extends GSetup {
             points.get(i).x += speeds.get(i).x*time;
             points.get(i).y += speeds.get(i).y*time;
 
-            speeds.get(i).x += ((speeds.get(i).x > 0)? -1 : 1)*0.05*time;
+//            speeds.get(i).x += ((speeds.get(i).x > 0)? -1 : 1)*0.05*time;
+            speeds.get(i).x *= (1-time/20);
             speeds.get(i).x *= ((Math.abs(speeds.get(i).x) < 0.002)? 0 : 1);
 
-            speeds.get(i).y += ((speeds.get(i).y > 0)? -1 : 1)*0.05*time;
+//            speeds.get(i).y += ((speeds.get(i).y > 0)? -1 : 1)*0.05*time;
+            speeds.get(i).y *= (1-time/20);
             speeds.get(i).y *= ((Math.abs(speeds.get(i).y) < 0.002)? 0 : 1);
 
         }
@@ -230,6 +232,7 @@ public class Jello extends GSetup {
     }
     public static void main(String[] args) {
         SetupManager.startGame(Jello.class);
+//        SetupManager.Debug.fpsGraph();
     }
 
 }
