@@ -5,6 +5,7 @@ import gEngine.GSetup;
 import gEngine.Vec2D;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 public class Jello extends GSetup {
@@ -15,16 +16,22 @@ public class Jello extends GSetup {
     ArrayList<Spring> springs;
     boolean clickNoSpam;
     boolean isStillHeld;
-
+    boolean eNoSpam;
+    boolean isTransparent;
     final double floor = -200;
+    final double mew = 0.5;
 
     @Override
     public void initialize() {
 
-        setFrameIcon(new GImage(10, 10));
+        setFrameIcon(new GImage(10,10));
+
+        setTitle("left click to make a spring, right click to make wind, E to make transparent");
 
         clickNoSpam = true;
         isStillHeld = false;
+        eNoSpam = true;
+        isTransparent = false;
 
         points = new ArrayList<>();
         accelerations = new ArrayList<>();
@@ -42,7 +49,7 @@ public class Jello extends GSetup {
 
         double angle = 0;
         double radius = 80;
-        double amount = 50;
+        double amount = 10;
 
         points.add(new Vec2D(0, 0));
         accelerations.add(new Vec2D(0, 0));
@@ -110,7 +117,7 @@ public class Jello extends GSetup {
                 int x = (xOnCanvas() - getFrameWidth() / 2);
                 int y = (getFrameHeight() / 2 - yOnCanvas());
                 Vec2D p = points.get(i);
-                double pow = (Math.sqrt((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y))) * -0.04;
+                double pow = 1/(Math.sqrt((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y))) * -800;
                 double angle = Math.atan2(y - p.y, x - p.x);
                 accelerations.get(i).x += pow * Math.cos(angle);
                 accelerations.get(i).y += pow * Math.sin(angle);
@@ -131,6 +138,14 @@ public class Jello extends GSetup {
         }
 
         for (int i = 0; i < points.size() - 1; i++) {
+
+            if(Math.abs(points.get(i).y - floor) < 5 && speeds.get(i).y < 0 && accelerations.get(i).y < 0) {
+                points.get(i).y = floor;
+                double normal = -accelerations.get(i).y;
+                accelerations.get(i).x += normal*mew*(speeds.get(i).x<0? 1 : (speeds.get(i).x>0? -1 : 0));
+                accelerations.get(i).y = 0;
+            }
+
             speeds.get(i).x += accelerations.get(i).x * time;
             speeds.get(i).y += accelerations.get(i).y * time;
 
@@ -217,6 +232,23 @@ public class Jello extends GSetup {
         points.get(points.size() - 1).x = xOnCanvas() - getFrameWidth() / 2.0;
         points.get(points.size() - 1).y = -(yOnCanvas() - getFrameHeight() / 2.0);
     }
+    private void draw() {
+        if(isTransparent) {
+            drawDots();
+        }
+        else {
+            fillShape();
+        }
+
+        if(lastKey() == KeyEvent.VK_E && eNoSpam) {
+            eNoSpam = false;
+            isTransparent = !isTransparent;
+        }
+        else if(lastKey() == -1 && !eNoSpam) {
+            eNoSpam = true;
+        }
+
+    }
 
     @Override
     public void execute() {
@@ -224,7 +256,7 @@ public class Jello extends GSetup {
         rotatePointer();
         makeSpringWhenLeftClicked();
         drawLine(0, (int) (getFrameHeight() / 2 - floor), getFrameWidth(), (int) (getFrameHeight() / 2 - floor), Color.BLACK);
-        fillShape();
+        draw();
         physics();
     }
 
