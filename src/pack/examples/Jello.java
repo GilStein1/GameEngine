@@ -1,5 +1,6 @@
 package pack.examples;
 
+import pack.GImage;
 import pack.GSetup;
 import pack.SetupManager;
 import pack.Vec2D;
@@ -21,6 +22,8 @@ public class Jello extends GSetup {
     @Override
     public void initialize() {
 
+        setFrameIcon(new GImage(10, 10));
+
         clickNoSpam = true;
         isStillHeld = false;
 
@@ -41,7 +44,12 @@ public class Jello extends GSetup {
 
         double angle = 0;
         double radius = 80;
-        double amount = 20;
+        double amount = 50;
+
+        points.add(new Vec2D(0,0));
+        accelerations.add(new Vec2D(0,0));
+        speeds.add(new Vec2D(0,0));
+        relativeToMouse.add(new Vec2D(0,0));
 
         for(int i = 0; i < amount; i++) {
             points.add(new Vec2D(radius*Math.cos(angle), radius*Math.sin(angle)));
@@ -59,8 +67,14 @@ public class Jello extends GSetup {
                 springs.add(new Spring(points.get(i), points.get(j), distance));
 
             }
+            double distance = Math.sqrt((points.get(i).x - points.get(0).x)*(points.get(i).x - points.get(0).x) + (points.get(i).y - points.get(0).y)*(points.get(i).y - points.get(0).y));
+            springs.add(new Spring(points.get(i), points.get(0), distance));
         }
 
+        points.add(new Vec2D(xOnCanvas()- getFrameWidth()/2.0, yOnCanvas() + 2* yOnCanvas() - getFrameHeight()/2));
+        accelerations.add(new Vec2D(0,0));
+        speeds.add(new Vec2D(0,0));
+        relativeToMouse.add(new Vec2D(0,0));
     }
 
     private void drawDots() {
@@ -77,18 +91,19 @@ public class Jello extends GSetup {
     }
 
     private void fillShape() {
-        Vec2D[] arr = new Vec2D[points.size()];
-        for(int i = 0; i < arr.length; i++) {
-            arr[i] = new Vec2D((int)(points.get(i).x + getFrameWidth()/2),(int)(getFrameHeight()/2 - points.get(i).y));
+        Vec2D[] arr = new Vec2D[points.size()-2];
+        for(int i = 1; i < arr.length + 1; i++) {
+            arr[i-1] = new Vec2D((int)(points.get(i).x + getFrameWidth()/2),(int)(getFrameHeight()/2 - points.get(i).y));
         }
         fillPolygon(Color.BLUE, arr);
+        if(leftClick()) {
+            drawLine(xOnCanvas(), yOnCanvas(), (int)(points.get(0).x + getFrameWidth()/2),(int)(getFrameHeight()/2 - points.get(0).y), Color.BLACK);
+        }
     }
 
     private void physics() {
 
         double time = deltaTime()*10;
-
-//        time = Math.min(0.09, time);
 
         for(int i = 0; i < points.size(); i++) {
             accelerations.get(i).y = -9.8;
@@ -96,13 +111,9 @@ public class Jello extends GSetup {
             if(rightClick()) {
                 int x = (xOnCanvas() - getFrameWidth()/2);
                 int y = (getFrameHeight()/2 - yOnCanvas());
-//                int x = xOnCanvas();
-//                int y = yOnCanvas();
                 Vec2D p = points.get(i);
                 double pow = (Math.sqrt((x - p.x)*(x - p.x) + (y - p.y)*(y - p.y)))*-0.04;
                 double angle = Math.atan2(y - p.y, x - p.x);
-//                System.out.println(y);
-//                System.out.println(Math.toDegrees(angle));
                 accelerations.get(i).x += pow*Math.cos(angle);
                 accelerations.get(i).y += pow*Math.sin(angle);
             }
@@ -121,7 +132,7 @@ public class Jello extends GSetup {
             accelerations.get(points.indexOf(s.getP1())).y -= Math.sin(angle)*s.getK()*distance;
         }
 
-        for(int i = 0; i < points.size(); i++) {
+        for(int i = 0; i < points.size()-1; i++) {
             speeds.get(i).x += accelerations.get(i).x*time;
             speeds.get(i).y += accelerations.get(i).y*time;
 
@@ -129,55 +140,85 @@ public class Jello extends GSetup {
                 points.get(i).y = floor;
                 speeds.get(i).y *= -0.7;
             }
+            else if(points.get(i).y > getFrameHeight()/2.0 && speeds.get(i).y > 0) {
+                points.get(i).y = getFrameHeight()/2.0;
+                speeds.get(i).y *= -0.7;
+            }
 
-            if(isStillHeld) {
-                accelerations.get(i).x = 0;
-                accelerations.get(i).y = 0;
-                speeds.get(i).x = 0;
-                speeds.get(i).y = 0;
+            if(points.get(i).x > getFrameWidth()/2.0 && speeds.get(i).x > 0) {
+                points.get(i).x = getFrameWidth()/2.0;
+                speeds.get(i).x *= -0.7;
+            }
+            else if(points.get(i).x < -getFrameWidth()/2.0 && speeds.get(i).x < 0) {
+                points.get(i).x = -getFrameWidth()/2.0;
+                speeds.get(i).x *= -0.7;
             }
 
             points.get(i).x += speeds.get(i).x*time;
             points.get(i).y += speeds.get(i).y*time;
 
-//            speeds.get(i).x += ((speeds.get(i).x > 0)? -1 : 1)*0.05*time;
             speeds.get(i).x *= (1-time/20);
             speeds.get(i).x *= ((Math.abs(speeds.get(i).x) < 0.002)? 0 : 1);
 
-//            speeds.get(i).y += ((speeds.get(i).y > 0)? -1 : 1)*0.05*time;
             speeds.get(i).y *= (1-time/20);
             speeds.get(i).y *= ((Math.abs(speeds.get(i).y) < 0.002)? 0 : 1);
 
         }
     }
 
+    private void rotatePointer() {
+        double x = 0;
+        double y = 0;
+        int count = 0;
+
+        for(Vec2D p : points) {
+            x += p.x;
+            y += p.y;
+            count++;
+        }
+        x /= count;
+        y /= count;
+
+        x = getFrameWidth()/2.0 + x;
+        y = getFrameHeight()/2.0 - y;
+
+        Vec2D dir = new Vec2D(x - xOnCanvas(), y - yOnCanvas());
+        dir.normalize();
+
+        final int length = 30;
+
+        double px = xOnCanvas() + length*dir.x;
+        double py = yOnCanvas() + length*dir.y;
+
+        Vec2D dir2 = new Vec2D(dir.y, -dir.x);
+
+        double px2 = xOnCanvas() + length/2.0*dir2.x;
+        double py2 = yOnCanvas() + length/2.0*dir2.y;
+
+        double px3 = xOnCanvas() - length/2.0*dir2.x;
+        double py3 = yOnCanvas() - length/2.0*dir2.y;
+
+        if(rightClick()) {
+            drawPolygon(new int[]{(int) px3, (int) px2, (int) px}, new int[]{(int) py3, (int) py2, (int) py}, Color.BLACK);
+        }
+    }
+
     @Override
     public void execute() {
-
-//        for(int i = -1000; i < 1000; i+=20) {
-//            drawLine(0, (int)(getFrameHeight()/2 - i), getFrameWidth(), (int)(getFrameHeight()/2 - i), new Color(0,0,0,100));
-//        }
-//        for(int i = -1000; i < 1000; i+=20) {
-//            drawLine(i+getFrameWidth()/2, 0, i+getFrameWidth()/2, getFrameHeight(), new Color(0,0,0,100));
-//        }
+        points.get(points.size()-1).x = xOnCanvas() - getFrameWidth()/2.0;
+        points.get(points.size()-1).y = -(yOnCanvas() - getFrameHeight()/2.0);
+        rotatePointer();
 
         if(leftClick() && clickNoSpam) {
             clickNoSpam = false;
             isStillHeld = true;
-            for(int i = 0; i < points.size(); i++) {
-                relativeToMouse.get(i).x = points.get(i).x - (xOnCanvas() + getFrameWidth()/2);
-                relativeToMouse.get(i).y = points.get(i).y - (getFrameHeight()/2 - yOnCanvas());
-            }
+            springs.add(new Spring(points.get(0), points.get(points.size()-1), 0));
+            springs.get(springs.size()-1).setK(3);
         }
         if(!leftClick() && !clickNoSpam) {
             clickNoSpam = true;
             isStillHeld = false;
-        }
-        if(isStillHeld) {
-            for(int i = 0; i < points.size(); i++) {
-                points.get(i).x = (xOnCanvas() + getFrameWidth()/2) + relativeToMouse.get(i).x;
-                points.get(i).y = (getFrameHeight()/2 - yOnCanvas()) + relativeToMouse.get(i).y;
-            }
+            springs.remove(springs.get(springs.size()-1));
         }
 
         drawLine(0, (int)(getFrameHeight()/2 - floor), getFrameWidth(), (int)(getFrameHeight()/2 - floor), Color.BLACK);
@@ -203,7 +244,7 @@ public class Jello extends GSetup {
 
         Vec2D[] points;
         private double l0;
-        private final double k = 3;
+        private double k = 1.5;
 
         public Spring(Vec2D p1, Vec2D p2, double l0) {
             this.l0 = l0;
@@ -212,6 +253,9 @@ public class Jello extends GSetup {
 
         public double getK() {
             return k;
+        }
+        public void setK(double newK) {
+            this.k = newK;
         }
 
         public Vec2D getP1() {
