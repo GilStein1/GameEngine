@@ -101,7 +101,7 @@ public class Jello extends GSetup {
             arr[i - 1] = new Vec2D((int) (points.get(i).x + getFrameWidth() / 2), (int) (getFrameHeight() / 2 - points.get(i).y));
         }
         fillPolygon(Color.BLUE, arr);
-        if (leftClick()) {
+        if (isStillHeld) {
             drawLine(xOnCanvas(), yOnCanvas(), (int) (points.get(0).x + getFrameWidth() / 2), (int) (getFrameHeight() / 2 - points.get(0).y), Color.BLACK);
         }
     }
@@ -215,7 +215,13 @@ public class Jello extends GSetup {
     }
 
     private void makeSpringWhenLeftClicked() {
-        if (leftClick() && clickNoSpam) {
+
+        double x = xOnCanvas() - getFrameWidth() / 2.0;
+        double y = -(yOnCanvas() - getFrameHeight() / 2.0);
+
+        boolean isMouseOnShape = Math.abs(points.get(0).x-x) < 80 && Math.abs(points.get(0).y-y) < 80;
+
+        if (leftClick() && clickNoSpam && isMouseOnShape) {
             clickNoSpam = false;
             isStillHeld = true;
             springs.add(new Spring(points.get(0), points.get(points.size() - 1), 0));
