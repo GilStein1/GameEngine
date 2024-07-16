@@ -2,6 +2,7 @@ package gEngine.examples;
 
 import gEngine.GImage;
 import gEngine.GSetup;
+import gEngine.GWebView;
 import gEngine.Vec2D;
 
 import java.awt.*;
@@ -20,9 +21,12 @@ public class Jello extends GSetup {
     boolean isTransparent;
     final double floor = -200;
     final double mew = 0.5;
+    GWebView gw;
 
     @Override
     public void initialize() {
+
+        gw = makeWebView();
 
         setFrameIcon(new GImage(10,10));
 

@@ -236,6 +236,9 @@ public abstract class GSetup {
                             pair.getAction().action(pair.getEvent());
                         }
                         execute();
+                        if(GWebView.isCreated()) {
+                            GWebView.setImage(getGImage());
+                        }
                         thingsToDrawLast();
                     }
                     graphics.dispose();
@@ -434,6 +437,9 @@ public abstract class GSetup {
             }
             updateSmoothness(smoothness, graphics);
             execute();
+            if(GWebView.isCreated()) {
+                GWebView.setImage(getGImage());
+            }
             thingsToDrawLast();
         }
 
@@ -1070,6 +1076,14 @@ public abstract class GSetup {
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         fc.showDialog(frame, approveButton);
         return fc.getSelectedFile().getAbsolutePath();
+    }
+
+    public GWebView makeWebView(int port) {
+        return GWebView.getInstance(port);
+    }
+
+    public GWebView makeWebView() {
+        return GWebView.getInstance();
     }
 
     /**
