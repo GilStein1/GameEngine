@@ -3,65 +3,74 @@ package gEngine;
 import com.sun.net.httpserver.HttpServer;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 
 public class GWebView {
 
-    private static GWebView instance;
     private static final int defaultPort = 8080;
+    private static boolean isCopyingScreen = true;
+    private static GWebView instance;
     private GImage img;
     private GImage imgToDrawOn;
-    private static boolean isCopyingScreen = true;
     private String title;
+    private String htmlContent;
 
     private GWebView(int port) {
-
         img = new GImage(100,100);
         imgToDrawOn = new GImage(100,100);
+        initializeTitle();
+        htmlContent = readHtmlFile();
+        HttpServer server = makeHttpServer(port);
+        createHttpHandler(server);
+        createFrameHandler(server);
+    }
+
+    private void initializeTitle() {
         String[] className = SetupManager.getInstance().getSetupClass().getName().split("\\.");
-
         title = className[className.length-1] + " GWebView";
+    }
 
+    private HttpServer makeHttpServer(int port) {
         HttpServer server = null;
         try {
             server = HttpServer.create(new InetSocketAddress(port), 0);
         } catch (IOException e) {
             throw new RuntimeException("failed to create server");
         }
+        return server;
+    }
+
+    private String readHtmlFile() {
+        String value;
+        ClassLoader classLoader = getClass().getClassLoader();
+        try (InputStream inputStream = classLoader.getResourceAsStream("WebView.html");
+             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line).append("\n");
+            }
+            value = stringBuilder.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return value.replace("TITLE", title);
+    }
+
+    private void createHttpHandler(HttpServer server) {
         server.createContext("/", exchange -> {
-            int width = SetupManager.getInstance().getSetup().getFrameWidth();
-            int height = SetupManager.getInstance().getSetup().getFrameHeight();
-            System.out.println(width + "," + height);
-            String response = "<html>" +
-                    "<head><title>" + title + "</title></head>" +
-                    "<style>" +
-                    "html, body { height: 100%; margin: 0; }" +
-                    "#container { display: flex; justify-content: center; align-items: center; height: 100%; }" +
-                    "#dynamicImage { max-width: 100%; max-height: 100%; }" +
-                    "</style>" +
-                    "<body>" +
-                    "<div id='container'>" +
-                    "<img id='dynamicImage' src='/image' alt='Dynamic Image'/>" +
-                    "</div>" +
-                    "<script>" +
-                    "function updateImage() {" +
-                    "    var img = document.getElementById('dynamicImage');" +
-                    "    img.src = '/image?' + new Date().getTime();" +
-                    "}" +
-                    "setInterval(updateImage, 50);" +
-                    "</script>" +
-                    "</body>" +
-                    "</html>";
+            String response = htmlContent;
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();
             os.write(response.getBytes());
             os.close();
         });
+    }
 
+    private void createFrameHandler(HttpServer server) {
         server.createContext("/image", exchange -> {
             GImage img = this.imgToDrawOn;
             GImage imgToSend = new GImage(img.getWidth(), img.getHeight());
@@ -78,7 +87,6 @@ public class GWebView {
         });
         server.setExecutor(Executors.newCachedThreadPool());
         server.start();
-
     }
 
     public void setTitle(String newTitle) {
