@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class Main extends GSetup {
     public static void main(String[] args) {
-        SetupManager.startGame(Jello.class);
+        SetupManager.startGame(RayCaster.class);
     }
     @Override
     public void initialize() {

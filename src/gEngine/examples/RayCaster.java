@@ -43,6 +43,9 @@ public class RayCaster extends GSetup {
         imageToScale = new GImage(screenWidth,screenHeight);
         light = new Vec2D(45 + screenWidth/2.0,45 + screenHeight/2.0);
         img = new GImage(screenWidth,screenHeight);
+        GWebView gw = makeWebView(img);
+        gw.setIcon(new GImage("Bird With Shadow.png"));
+        gw.setTitle("Map for ray caster");
         panel = new GPanel(600,0,600,600,"RayCasting View",img);
         addGPanel(panel);
         panel.setVisible(!fs);
