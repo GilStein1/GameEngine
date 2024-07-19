@@ -1,9 +1,6 @@
 package gEngine;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -17,10 +14,17 @@ public class GWebView {
     private static GWebView instance;
     private static final int defaultPort = 8080;
     private GImage img;
+    private GImage imgToDrawOn;
+    private static boolean isCopyingScreen = true;
+    private String title;
 
     private GWebView(int port) {
 
         img = new GImage(100,100);
+        imgToDrawOn = new GImage(100,100);
+        String[] className = SetupManager.getInstance().getSetupClass().getName().split("\\.");
+
+        title = className[className.length-1] + " GWebView";
 
         HttpServer server = null;
         try {
@@ -33,7 +37,7 @@ public class GWebView {
             int height = SetupManager.getInstance().getSetup().getFrameHeight();
             System.out.println(width + "," + height);
             String response = "<html>" +
-                    "<head><title>Dynamic Image Stream</title></head>" +
+                    "<head><title>" + title + "</title></head>" +
                     "<style>" +
                     "html, body { height: 100%; margin: 0; }" +
                     "#container { display: flex; justify-content: center; align-items: center; height: 100%; }" +
@@ -46,9 +50,9 @@ public class GWebView {
                     "<script>" +
                     "function updateImage() {" +
                     "    var img = document.getElementById('dynamicImage');" +
-                    "    img.src = '/image?' + new Date().getTime();" + // add timestamp to avoid caching
+                    "    img.src = '/image?' + new Date().getTime();" +
                     "}" +
-                    "setInterval(updateImage, 50);" + // update every 100 milliseconds
+                    "setInterval(updateImage, 50);" +
                     "</script>" +
                     "</body>" +
                     "</html>";
@@ -59,7 +63,7 @@ public class GWebView {
         });
 
         server.createContext("/image", exchange -> {
-            GImage img = this.img;
+            GImage img = this.imgToDrawOn;
             GImage imgToSend = new GImage(img.getWidth(), img.getHeight());
             imgToSend.drawImage(0,0, img.getWidth(), img.getHeight(), img);
             BufferedImage bufferedImage = imgToSend.getImage();
@@ -77,18 +81,30 @@ public class GWebView {
 
     }
 
+    public void setTitle(String newTitle) {
+        this.title = newTitle;
+    }
+
     static boolean isCreated() {
         return instance != null;
     }
 
+    static boolean isCopyingScreen() {
+        return isCopyingScreen;
+    }
+
     static void setImage(GImage image) {
         getInstance().img = image;
+    }
+    static void updateFrame() {
+        getInstance().imgToDrawOn = new GImage(getInstance().img);
     }
 
     static GWebView getInstance(int port) {
         if(instance == null) {
             instance = new GWebView(port);
         }
+        isCopyingScreen &= true;
         return instance;
     }
 
@@ -96,6 +112,25 @@ public class GWebView {
         if(instance == null) {
             instance = new GWebView(defaultPort);
         }
+        isCopyingScreen &= true;
+        return instance;
+    }
+
+    static GWebView getInstance(GImage image, int port) {
+        if(instance == null) {
+            instance = new GWebView(port);
+        }
+        isCopyingScreen &= false;
+        setImage(image);
+        return instance;
+    }
+
+    static GWebView getInstance(GImage image) {
+        if(instance == null) {
+            instance = new GWebView(defaultPort);
+        }
+        isCopyingScreen &= false;
+        setImage(image);
         return instance;
     }
 

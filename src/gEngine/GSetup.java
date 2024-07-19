@@ -237,6 +237,9 @@ public abstract class GSetup {
                         }
                         execute();
                         if(GWebView.isCreated()) {
+                            GWebView.updateFrame();
+                        }
+                        if(GWebView.isCreated() && GWebView.isCopyingScreen()) {
                             GWebView.setImage(getGImage());
                         }
                         thingsToDrawLast();
@@ -438,6 +441,9 @@ public abstract class GSetup {
             updateSmoothness(smoothness, graphics);
             execute();
             if(GWebView.isCreated()) {
+                GWebView.updateFrame();
+            }
+            if(GWebView.isCreated() && GWebView.isCopyingScreen()) {
                 GWebView.setImage(getGImage());
             }
             thingsToDrawLast();
@@ -1084,6 +1090,14 @@ public abstract class GSetup {
 
     public GWebView makeWebView() {
         return GWebView.getInstance();
+    }
+
+    public GWebView makeWebView(GImage image, int port) {
+        return GWebView.getInstance(image, port);
+    }
+
+    public GWebView makeWebView(GImage image) {
+        return GWebView.getInstance(image);
     }
 
     /**
