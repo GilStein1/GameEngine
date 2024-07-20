@@ -20,7 +20,6 @@ public class GWebView {
 
     private GWebView(int port) {
         icon = new GImage("G-icon.png");
-//        icon.drawImage(0,0,16,16,new GImage("G-icon.png"));
         img = new GImage(100,100);
         imgToDrawOn = new GImage(100,100);
         initializeTitle();

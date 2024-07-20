@@ -3,6 +3,7 @@ package gEngine.examples;
 import gEngine.GFile;
 import gEngine.GImage;
 import gEngine.GSetup;
+import gEngine.SetupManager;
 
 import java.awt.*;
 
@@ -16,7 +17,8 @@ public class Painter extends GSetup {
         img = new GImage(900,600);
         img.fillRectangle(0,0,900,600,Color.WHITE);
         setResizable(false);
-        imported = loadFromPath(GFileChooser("Yes"));
+//        imported = loadFromPath(GFileChooser("Yes"));
+        imported = loadFromPath((String) SetupManager.pullFromPool("file"));
         img.drawImage(0,0,900,600,imported);
     }
 

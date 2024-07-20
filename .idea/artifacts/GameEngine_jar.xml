@@ -3,7 +3,6 @@
     <output-path>$PROJECT_DIR$/out/artifacts/GameEngine_jar</output-path>
     <root id="archive" name="GameEngine.jar">
       <element id="module-output" name="GameEngine" />
-      <element id="module-source" name="GameEngine" />
     </root>
   </artifact>
 </component>
