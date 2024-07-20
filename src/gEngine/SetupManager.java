@@ -1,7 +1,11 @@
 package gEngine;
 
+import gEngine.examples.Main;
+import gEngine.utilities.ExecutableBuilder;
+
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -52,6 +56,46 @@ public class SetupManager {
             }
         };
         fps.add(fpsPanel);
+    }
+    public static void makeExecutable(Class<?> mainClass, Class<?> game) {
+        String[] path = System.getProperty("user.dir").split("\\\\");
+        if(!path[path.length-2].equals("Users") && mainClass.getProtectionDomain().getCodeSource().getLocation().getPath().substring(1).endsWith(".jar")) {
+
+            System.out.println("it is compiled");
+
+            File f = new File(System.getenv("APPDATA") + "/GSetup");
+
+            if (!f.exists()) {
+                f.mkdir();
+            }
+            String s = game.getName();
+            s = "SetupManager\\" + s.split("\\.")[s.split("\\.").length - 1];
+            f = new File(System.getenv("APPDATA") + "/GSetup/" + s);
+            if (!f.exists()) {
+                f.mkdirs();
+            }
+            f = new File(System.getenv("APPDATA") + "\\" + "\\GSetup\\" + s + "\\values.txt");
+
+            GFile file = new GFile(f);
+
+            if(file.accidentallyCreatedNewFile()) {
+                file.println("executedCreated");
+                file.stopWriting();
+                System.out.println("starting to create executable");
+                SetupManager.pushValueToPool(mainClass.getProtectionDomain().getCodeSource().getLocation().getPath().substring(1), "fileToExecutable");
+                startGame(ExecutableBuilder.class);
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+
+        }
+
+
     }
     public static SetupManager getInstance() {
         if(instance == null) {

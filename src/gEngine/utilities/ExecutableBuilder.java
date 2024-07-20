@@ -2,6 +2,7 @@ package gEngine.utilities;
 
 import gEngine.GFile;
 import gEngine.GSetup;
+import gEngine.SetupManager;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,12 +14,14 @@ public class ExecutableBuilder extends GSetup {
 
     @Override
     public void initialize() {
-        setFrameSize(5,5);
-        javaFile = GFileChooser("select");
+        setFrameSize(5, 5);
+//        javaFile = GFileChooser("select");
+        javaFile = (String)(SetupManager.pullFromPool("fileToExecutable"));
+        System.out.println("the requested file is: " + javaFile);
         loadFileInGSetupResources("jarFiles", "non.txt");
-        if(!javaFile.equals("")) {
+        if (!javaFile.equals("")) {
             String sourceFile = javaFile;
-            String[] fileName = javaFile.split("\\\\");
+            String[] fileName = javaFile.split("/");
             String destinationFile = System.getenv("APPDATA") + "\\GSetup\\ExecutableBuilder\\jarFiles\\" + fileName[fileName.length - 1];
 
             try (FileInputStream fis = new FileInputStream(sourceFile); FileOutputStream fos = new FileOutputStream(destinationFile)) {
@@ -30,17 +33,17 @@ public class ExecutableBuilder extends GSetup {
             } catch (IOException ignored) {
             }
             String[] fileNames2 = javaFile.split("\\.");
-            String[] batLocations = (fileNames2[fileNames2.length-2] + ".bat").split("\\\\");
+            String[] batLocations = (fileNames2[fileNames2.length - 2] + ".bat").split("\\\\");
             String batLocation = "";
-            for(int i = 0; i < batLocations.length-1; i++) {
+            for (int i = 0; i < batLocations.length - 1; i++) {
                 batLocation += batLocations[i];
-                if(i != batLocations.length-2) {
+                if (i != batLocations.length - 2) {
                     batLocation += "/";
                 }
             }
             System.out.println(batLocation);
-            System.out.println(batLocations[batLocations.length-1]);
-            kept = loadFile(batLocation, batLocations[batLocations.length-1]);
+            System.out.println(batLocations[batLocations.length - 1]);
+            kept = loadFile(batLocation, batLocations[batLocations.length - 1]);
             kept.println("@echo off");
             kept.println("start javaw -jar \"" + destinationFile + "\" %1");
             kept.println("exit");
