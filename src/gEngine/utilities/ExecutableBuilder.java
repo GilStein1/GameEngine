@@ -15,6 +15,7 @@ public class ExecutableBuilder extends GSetup {
     public void initialize() {
         setFrameSize(5,5);
         javaFile = GFileChooser("select");
+        loadFileInGSetupResources("jarFiles", "non.txt");
         if(!javaFile.equals("")) {
             String sourceFile = javaFile;
             String[] fileName = javaFile.split("\\\\");
