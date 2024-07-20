@@ -1,6 +1,5 @@
 package gEngine;
 
-import gEngine.examples.Main;
 import gEngine.utilities.ExecutableBuilder;
 
 import javax.swing.*;
