@@ -23,7 +23,7 @@ public class Main2 extends GSetup {
     @Override
     public void execute() {
 
-        drawText(xOnCanvas(),yOnCanvas(),"mjashgdwjad", Color.BLUE);
+        drawText((int)SetupManager.pullFromPool("x"),(int)SetupManager.pullFromPool("y"),"mjashgdwjad", Color.BLUE);
 
     }
 

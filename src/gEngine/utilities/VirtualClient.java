@@ -55,28 +55,53 @@ public class VirtualClient extends GSetup {
             DataOutputStream out = null;
             BufferedReader in = null;
             Socket clientSocket = null;
-            try {
-                serverSocket = new ServerSocket((int)SetupManager.pullFromPool("portOfHost"));
-            }
-            catch (IOException e) {
-                throw new RuntimeException(e);
-            }
             while (true) {
                 try {
+                    serverSocket = new ServerSocket((int)SetupManager.pullFromPool("portOfHost") + 1);
+//                    System.out.println("waiting");
+//                    System.out.println((int)SetupManager.pullFromPool("portOfHost") + 1);
                     clientSocket = serverSocket.accept();
+//                    System.out.println("connected");
                     in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                     out = new DataOutputStream(clientSocket.getOutputStream());
+//                    System.out.println("--");
                     String message = in.readLine();
+//                    System.out.println("||" + message);
+                    handelTCPRequest(out, message);
+                    serverSocket.close();
                     clientSocket.close();
                     in.close();
                     out.close();
                 }
                 catch (IOException ignored) {
-
+//                    System.out.println("err");
                 }
             }
         });
         tcpServer.start();
+    }
+
+    private void handelTCPRequest(DataOutputStream outputStream, String message) {
+//        System.out.println("gotHere");
+        if(message.startsWith("ge ~s")) {
+            message = message.substring(6);
+            String[] parts = message.split("~");
+            try {
+                switch (parts[1]) {
+                    case "xoc" -> {
+                        String response = "ge ~c ~xoc|~x:" + xOnCanvas();
+                        outputStream.write(response.getBytes());
+                    }
+                }
+                switch (parts[1]) {
+                    case "yoc" -> {
+                        String response = "ge ~c ~yoc|~y:" + yOnCanvas();
+                        outputStream.write(response.getBytes());
+                    }
+                }
+            }
+            catch (IOException ignored) {}
+        }
     }
 
     private boolean updateImgByMessage(String message) {
@@ -88,7 +113,7 @@ public class VirtualClient extends GSetup {
             switch (parts[1]) {
                 case "exStart" -> {
                     drawingImg = new GImage(getFrameWidth(),getFrameHeight());
-                    System.out.println("yes");
+//                    System.out.println("yes");
                     return false;
                 }
                 case "drEll|" -> {
@@ -107,13 +132,63 @@ public class VirtualClient extends GSetup {
                 case "flEll|" -> {
                     if(drawingImg != null) {
                         String temp = message.substring(message.indexOf("|")+2);
-//                        System.out.println(temp);
                         String[] vars = temp.split("~");
                         drawingImg.fillEllipse(
                                 Integer.parseInt(vars[0].substring(2)),
                                 Integer.parseInt(vars[1].substring(2)),
                                 Integer.parseInt(vars[2].substring(2)),
                                 Integer.parseInt(vars[3].substring(2)),
+                                new Color(Integer.parseInt(vars[4].substring(2)))
+                        );
+                    }
+                }
+                case "drRec|" -> {
+                    if(drawingImg != null) {
+                        String temp = message.substring(message.indexOf("|")+2);
+                        String[] vars = temp.split("~");
+                        drawingImg.drawRectangle(
+                                Integer.parseInt(vars[0].substring(2)),
+                                Integer.parseInt(vars[1].substring(2)),
+                                Integer.parseInt(vars[2].substring(2)),
+                                Integer.parseInt(vars[3].substring(2)),
+                                new Color(Integer.parseInt(vars[4].substring(2)))
+                        );
+                    }
+                }
+                case "flRec|" -> {
+                    if(drawingImg != null) {
+                        String temp = message.substring(message.indexOf("|")+2);
+                        String[] vars = temp.split("~");
+                        drawingImg.fillRectangle(
+                                Integer.parseInt(vars[0].substring(2)),
+                                Integer.parseInt(vars[1].substring(2)),
+                                Integer.parseInt(vars[2].substring(2)),
+                                Integer.parseInt(vars[3].substring(2)),
+                                new Color(Integer.parseInt(vars[4].substring(2)))
+                        );
+                    }
+                }
+                case "drTxt|" -> {
+                    if(drawingImg != null) {
+                        String temp = message.substring(message.indexOf("|")+2);
+                        String[] vars = temp.split("~");
+                        drawingImg.drawText(
+                                Integer.parseInt(vars[0].substring(2)),
+                                Integer.parseInt(vars[1].substring(2)),
+                                vars[2].substring(2),
+                                new Color(Integer.parseInt(vars[3].substring(2)))
+                        );
+                    }
+                }
+                case "drLine|" -> {
+                    if(drawingImg != null) {
+                        String temp = message.substring(message.indexOf("|")+2);
+                        String[] vars = temp.split("~");
+                        drawingImg.drawLine(
+                                Integer.parseInt(vars[0].substring(3)),
+                                Integer.parseInt(vars[1].substring(3)),
+                                Integer.parseInt(vars[2].substring(3)),
+                                Integer.parseInt(vars[3].substring(3)),
                                 new Color(Integer.parseInt(vars[4].substring(2)))
                         );
                     }

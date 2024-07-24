@@ -119,7 +119,7 @@ public class SetupManager {
             return getInstance().valuesPool.get(name);
         }
         else {
-            throw new RuntimeException("pulled value does not exist");
+            throw new IllegalArgumentException("pulled value does not exist");
         }
     }
     public static void moveToSetup(Class<?> setup) {
