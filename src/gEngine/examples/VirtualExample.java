@@ -7,7 +7,9 @@ import java.awt.*;
 
 public class VirtualExample extends VirtualGSetup {
 
-    double x = 0;
+//    double x = 0;
+    int[] x;
+    int[] y;
 
     public VirtualExample(int port) {
         super(port);
@@ -15,7 +17,8 @@ public class VirtualExample extends VirtualGSetup {
 
     @Override
     public void initialize() {
-
+        x = new int[]{(int)(Math.random()*600),(int)(Math.random()*600),(int)(Math.random()*600),(int)(Math.random()*600),(int)(Math.random()*600)};
+        y = new int[]{(int)(Math.random()*600),(int)(Math.random()*600),(int)(Math.random()*600),(int)(Math.random()*600),(int)(Math.random()*600)};
     }
 
     @Override
@@ -24,8 +27,12 @@ public class VirtualExample extends VirtualGSetup {
         int y = yOnCanvas();
         SetupManager.pushValueToPool(x, "x");
         SetupManager.pushValueToPool(y, "y");
+
+        this.x[0] = x;
+        this.y[0] = y;
 //        fillEllipse(x,y,100,100, Color.BLUE);
-        drawText(x,y,"Hello World", Color.BLUE);
+//        drawText(x,y,"Hello World", Color.BLUE);
+        fillPolygon(this.x,this.y,Color.RED);
 //        System.out.println(new Color(0,(x/900)*255,(y/600)*255).getRGB());
 //        drawLine((int)x,100,100,400, Color.BLUE);
 //        x+=0.001;

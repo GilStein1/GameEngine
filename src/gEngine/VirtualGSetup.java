@@ -52,15 +52,13 @@ public abstract class VirtualGSetup{
                         BufferedReader in = new BufferedReader(new InputStreamReader(tcpSocket.getInputStream()));
                         handelTcp(in.readLine());
                         tcpSocket.close();
-                    } catch (IOException e) {
-//                        System.out.println(clientPort + 1);
-//                        System.out.println("error");
-//                        throw new RuntimeException(e);
+                    } catch (IOException ignored) {
                     }
                 }
             }
         });
         tcpHandler.start();
+        initialize();
         Thread t = new Thread(() -> {
             while (true) {
                 tick();
@@ -152,6 +150,30 @@ public abstract class VirtualGSetup{
 
     public void fillRectangle(int x, int y, int width, int height, Color color) {
         methods.insert("ge ~s ~flRec|~x:" + x + "~y:" + y + "~w:" + width + "~h:" + height + "~c:" + color.getRGB());
+    }
+
+    public void drawPolygon(int[] x, int[] y, Color color) {
+        String xVal = "";
+        for(int i = 0; i < x.length; i++) {
+            xVal += x[i] + ((i < x.length-1)? "," : "");
+        }
+        String yVal = "";
+        for(int i = 0; i < x.length; i++) {
+            yVal += y[i] + ((i < y.length-1)? "," : "");
+        }
+        methods.insert("ge ~s ~drPol|~x:" + xVal + "~y:" + yVal + "~c:" + color.getRGB());
+    }
+
+    public void fillPolygon(int[] x, int[] y, Color color) {
+        String xVal = "";
+        for(int i = 0; i < x.length; i++) {
+            xVal += x[i] + ((i < x.length-1)? "," : "");
+        }
+        String yVal = "";
+        for(int i = 0; i < x.length; i++) {
+            yVal += y[i] + ((i < y.length-1)? "," : "");
+        }
+        methods.insert("ge ~s ~flPol|~x:" + xVal + "~y:" + yVal + "~c:" + color.getRGB());
     }
 
     public void drawLine(int x1, int y1, int x2, int y2, Color color) {

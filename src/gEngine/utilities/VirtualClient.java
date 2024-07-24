@@ -168,6 +168,36 @@ public class VirtualClient extends GSetup {
                         );
                     }
                 }
+                case "drPol|" -> {
+                    if(drawingImg != null) {
+                        String temp = message.substring(message.indexOf("|")+2);
+                        String[] vars = temp.split("~");
+                        String[] xStr = vars[0].substring(2).split(",");
+                        String[] yStr = vars[1].substring(2).split(",");
+                        int[] x = new int[xStr.length];
+                        int[] y = new int[yStr.length];
+                        for(int i = 0; i < x.length; i++) {
+                            x[i] = Integer.valueOf(xStr[i]);
+                            y[i] = Integer.valueOf(yStr[i]);
+                        }
+                        drawingImg.drawPolygon(x,y,new Color(Integer.parseInt(vars[2].substring(2))));
+                    }
+                }
+                case "flPol|" -> {
+                    if(drawingImg != null) {
+                        String temp = message.substring(message.indexOf("|")+2);
+                        String[] vars = temp.split("~");
+                        String[] xStr = vars[0].substring(2).split(",");
+                        String[] yStr = vars[1].substring(2).split(",");
+                        int[] x = new int[xStr.length];
+                        int[] y = new int[yStr.length];
+                        for(int i = 0; i < x.length; i++) {
+                            x[i] = Integer.valueOf(xStr[i]);
+                            y[i] = Integer.valueOf(yStr[i]);
+                        }
+                        drawingImg.fillPolygon(x,y,new Color(Integer.parseInt(vars[2].substring(2))));
+                    }
+                }
                 case "drTxt|" -> {
                     if(drawingImg != null) {
                         String temp = message.substring(message.indexOf("|")+2);
