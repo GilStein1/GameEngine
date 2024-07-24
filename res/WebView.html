@@ -28,6 +28,7 @@
         function updateImage() {
             var img = document.getElementById('dynamicImage');
             img.src = '/image?' + new Date().getTime();
+            // img.src = '/image';
         }
         setInterval(updateImage, 50);
 

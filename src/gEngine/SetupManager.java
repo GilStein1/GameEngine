@@ -1,6 +1,7 @@
 package gEngine;
 
 import gEngine.utilities.ExecutableBuilder;
+import gEngine.utilities.VirtualClient;
 
 import javax.swing.*;
 import java.awt.*;
@@ -55,6 +56,12 @@ public class SetupManager {
             }
         };
         fps.add(fpsPanel);
+    }
+
+    public static void startVirtualClient(String address, int port) {
+        pushValueToPool(address, "ipOfHost");
+        pushValueToPool(port, "portOfHost");
+        startGame(VirtualClient.class);
     }
     public static void makeExecutable(Class<?> mainClass, Class<?> game) {
         String[] path = System.getProperty("user.dir").split("\\\\");
