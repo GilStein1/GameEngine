@@ -76,12 +76,15 @@ public class VirtualClient extends GSetup {
                     String message = in.readLine();
 //                    System.out.println("got message");
                     handelTCPRequest(out, message);
+                    Thread.sleep(5);
 //                    serverSocket.close();
 //                    clientSocket.close();
 //                    in.close();
 //                    out.close();
                 }
                 catch (IOException ignored) {
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
             }
         });
@@ -105,6 +108,10 @@ public class VirtualClient extends GSetup {
                     }
                     case "lc" -> {
                         String response = "ge ~c ~lc|~a:" + leftClick();
+                        outputStream.write((response + "\n").getBytes());
+                    }
+                    case "rc" -> {
+                        String response = "ge ~c ~rc|~a:" + rightClick();
                         outputStream.write((response + "\n").getBytes());
                     }
                 }
@@ -250,7 +257,7 @@ public class VirtualClient extends GSetup {
 //            System.out.println(lastMessage);
 //            System.out.println(methods.length);
             drawingImg.fillRectangle(0,0,getFrameWidth(), getFrameHeight(), defaultBackground);
-            for(int i = 0; i < methods.length-1; i++) {
+            for(int i = 0; i < methods.length; i++) {
                 updateImgByMessage(methods[i]);
             }
         }

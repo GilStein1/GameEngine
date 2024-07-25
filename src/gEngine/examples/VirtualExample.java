@@ -112,22 +112,22 @@ public class VirtualExample extends VirtualGSetup {
 
     private void physics() {
 
-//        double time = deltaTime() * 10;
+        double time = deltaTime() * 10;
 
-        double time = 0.002;
+//        double time = 0.002;
 
         for (int i = 0; i < points.size(); i++) {
             accelerations.get(i).y = -9.8;
             accelerations.get(i).x = 0;
-//            if (rightClick()) {
-//                int x = (xOnCanvas() - getFrameWidth() / 2);
-//                int y = (getFrameHeight() / 2 - yOnCanvas());
-//                Vec2D p = points.get(i);
-//                double pow = 1/(Math.sqrt((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y))) * -800;
-//                double angle = Math.atan2(y - p.y, x - p.x);
-//                accelerations.get(i).x += pow * Math.cos(angle);
-//                accelerations.get(i).y += pow * Math.sin(angle);
-//            }
+            if (rightClick()) {
+                int x = (xOnCanvas() - 900 / 2);
+                int y = (600 / 2 - yOnCanvas());
+                Vec2D p = points.get(i);
+                double pow = 1/(Math.sqrt((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y))) * -800;
+                double angle = Math.atan2(y - p.y, x - p.x);
+                accelerations.get(i).x += pow * Math.cos(angle);
+                accelerations.get(i).y += pow * Math.sin(angle);
+            }
         }
 
         for (Jello.Spring s : springs) {
@@ -215,9 +215,9 @@ public class VirtualExample extends VirtualGSetup {
         double px3 = xOnCanvas() - length / 2.0 * dir2.x;
         double py3 = yOnCanvas() - length / 2.0 * dir2.y;
 
-//        if (rightClick()) {
-//            drawPolygon(new int[]{(int) px3, (int) px2, (int) px}, new int[]{(int) py3, (int) py2, (int) py}, Color.BLACK);
-//        }
+        if (rightClick()) {
+            drawPolygon(new int[]{(int) px3, (int) px2, (int) px}, new int[]{(int) py3, (int) py2, (int) py}, Color.BLACK);
+        }
     }
 
     private void makeSpringWhenLeftClicked() {

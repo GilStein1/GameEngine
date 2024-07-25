@@ -17,11 +17,18 @@ public abstract class VirtualGSetup{
     private int canvasX;
     private int canvasY;
     private boolean leftClick;
+    private boolean rightClick;
+    private boolean xOnScreenValueUpdate;
+    private boolean yOnScreenValueUpdate;
+    private boolean leftClickValueUpdate;
+    private boolean rightClickValueUpdate;
     private int port;
     private Queue<String> methods;
     private Queue<String> requests;
     private Thread tcpHandler;
     private String methodStr;
+    private long lastTime;
+    private double deltaTime;
 
     public abstract void initialize();
     public abstract void execute();
@@ -33,11 +40,14 @@ public abstract class VirtualGSetup{
     }
 
     private void init() {
+        lastTime = System.nanoTime();
         xOnScreen = 0;
         yOnScreen = 0;
         canvasX = 0;
         canvasY = 0;
         leftClick = false;
+        rightClick = false;
+        resetAllTcpCalledValues();
         methods = new Queue<>();
         methodStr = "";
         requests = new Queue<>();
@@ -104,6 +114,11 @@ public abstract class VirtualGSetup{
                     String[] vars = temp.split("~");
                     leftClick = Boolean.parseBoolean(vars[0].substring(2));
                 }
+                case "rc|" -> {
+                    String temp = message.substring(message.indexOf("|")+2);
+                    String[] vars = temp.split("~");
+                    rightClick = Boolean.parseBoolean(vars[0].substring(2));
+                }
             }
         }
     }
@@ -131,15 +146,23 @@ public abstract class VirtualGSetup{
 //        System.out.println("yes");
     }
 
+    public void resetAllTcpCalledValues() {
+        xOnScreenValueUpdate = true;
+        yOnScreenValueUpdate = true;
+        leftClickValueUpdate = true;
+        rightClickValueUpdate = true;
+    }
+
     public void tick() {
         if(madeAConnection) {
             methods.insert("ge ~s ~exStart");
             execute();
             methods.insert("ge ~s ~exEnd");
+            resetAllTcpCalledValues();
 //            System.out.println(methodStr.split("\\\\").length);
             String method = methodStr.substring(0);
 //            System.out.println(method.getBytes().length);
-            System.out.println(method);
+//            System.out.println(method);
             try {
                 DatagramPacket sendMethod = new DatagramPacket(method.getBytes(), method.length(), clientAddress, clientPort);
                 udpSocket.send(sendMethod);
@@ -147,35 +170,47 @@ public abstract class VirtualGSetup{
                 throw new RuntimeException(e);
             }
             methodStr = "";
-//            while (!methods.isEmpty()) {
-//                try {
-////                    String method = methods.head();
-////                    String method = "";
-////                    while (!methods.isEmpty()) {
-////                        method += methods.remove() + "&&";
-////                    }
-//                    DatagramPacket sendMethod = new DatagramPacket(method.getBytes(), method.length(), clientAddress, clientPort);
-//                    udpSocket.send(sendMethod);
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                }
-////                methods.remove();
-//            }
+            deltaTime = (System.nanoTime() - lastTime)/1000000000.0;
+            lastTime = System.nanoTime();
         }
     }
+
+    public double deltaTime() {
+        if(deltaTime > 0.1) {
+            return 0;
+        }
+        return deltaTime;
+    }
+
     public int xOnCanvas() {
-        requests.insert("ge ~s ~xoc");
-//        System.out.println("put x in queue");
+        if(xOnScreenValueUpdate) {
+            requests.insert("ge ~s ~xoc");
+            xOnScreenValueUpdate = false;
+        }
         return xOnScreen;
     }
     public int yOnCanvas() {
-        requests.insert("ge ~s ~yoc");
+        if(yOnScreenValueUpdate) {
+            requests.insert("ge ~s ~yoc");
+            yOnScreenValueUpdate = false;
+        }
         return yOnScreen;
     }
 
     public boolean leftClick() {
-        requests.insert("ge ~s ~lc");
+        if(leftClickValueUpdate) {
+            requests.insert("ge ~s ~lc");
+            leftClickValueUpdate = false;
+        }
         return leftClick;
+    }
+
+    public boolean rightClick() {
+        if(rightClickValueUpdate) {
+            requests.insert("ge ~s ~rc");
+            rightClickValueUpdate = false;
+        }
+        return rightClick;
     }
 
     public void drawEllipse(int x, int y, int width, int height, Color color) {
