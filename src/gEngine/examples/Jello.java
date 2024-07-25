@@ -275,7 +275,7 @@ public class Jello extends GSetup {
         return false;
     }
 
-    private static class Spring {
+    static class Spring {
 
         Vec2D[] points;
         private double l0;

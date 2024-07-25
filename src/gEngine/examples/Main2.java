@@ -18,12 +18,20 @@ public class Main2 extends GSetup {
             VirtualExample ve = new VirtualExample(8080);
         });
         t.start();
+        SetupManager.pushValueToPool(0,"x");
+        SetupManager.pushValueToPool(0,"y");
     }
 
     @Override
     public void execute() {
 
+
         drawText((int)SetupManager.pullFromPool("x"),(int)SetupManager.pullFromPool("y"),"mjashgdwjad", Color.BLUE);
+
+//        try {
+//            drawText((int)SetupManager.pullFromPool("x"),(int)SetupManager.pullFromPool("y"),"mjashgdwjad", Color.BLUE);
+//        }
+//        catch (IllegalArgumentException ignored) {}
 
     }
 

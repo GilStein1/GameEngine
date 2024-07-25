@@ -29,7 +29,7 @@ public class VirtualClient extends GSetup {
         frameUpdate = new Thread(() -> {
             while (true) {
                 try {
-                    byte[] receiveData = new byte[1024];
+                    byte[] receiveData = new byte[65507];
                     DatagramPacket receivedPacket = new DatagramPacket(receiveData, receiveData.length);
                     udpSocket.receive(receivedPacket);
                     lastMessage = new String(receivedPacket.getData(), 0, receivedPacket.getLength());
@@ -55,26 +55,33 @@ public class VirtualClient extends GSetup {
             DataOutputStream out = null;
             BufferedReader in = null;
             Socket clientSocket = null;
+
+            try {
+                serverSocket = new ServerSocket((int)SetupManager.pullFromPool("portOfHost") + 1);
+                clientSocket = serverSocket.accept();
+//                System.out.println("connected");
+                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                out = new DataOutputStream(clientSocket.getOutputStream());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
             while (true) {
                 try {
-                    serverSocket = new ServerSocket((int)SetupManager.pullFromPool("portOfHost") + 1);
-//                    System.out.println("waiting");
-//                    System.out.println((int)SetupManager.pullFromPool("portOfHost") + 1);
-                    clientSocket = serverSocket.accept();
-//                    System.out.println("connected");
-                    in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                    out = new DataOutputStream(clientSocket.getOutputStream());
-//                    System.out.println("--");
+//                    System.out.println("waiting for message");
+//                    serverSocket = new ServerSocket((int)SetupManager.pullFromPool("portOfHost") + 1);
+//                    clientSocket = serverSocket.accept();
+//                    in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+//                    out = new DataOutputStream(clientSocket.getOutputStream());
                     String message = in.readLine();
-//                    System.out.println("||" + message);
+//                    System.out.println("got message");
                     handelTCPRequest(out, message);
-                    serverSocket.close();
-                    clientSocket.close();
-                    in.close();
-                    out.close();
+//                    serverSocket.close();
+//                    clientSocket.close();
+//                    in.close();
+//                    out.close();
                 }
                 catch (IOException ignored) {
-//                    System.out.println("err");
                 }
             }
         });
@@ -90,13 +97,15 @@ public class VirtualClient extends GSetup {
                 switch (parts[1]) {
                     case "xoc" -> {
                         String response = "ge ~c ~xoc|~x:" + xOnCanvas();
-                        outputStream.write(response.getBytes());
+                        outputStream.write((response + "\n").getBytes());
                     }
-                }
-                switch (parts[1]) {
                     case "yoc" -> {
                         String response = "ge ~c ~yoc|~y:" + yOnCanvas();
-                        outputStream.write(response.getBytes());
+                        outputStream.write((response + "\n").getBytes());
+                    }
+                    case "lc" -> {
+                        String response = "ge ~c ~lc|~a:" + leftClick();
+                        outputStream.write((response + "\n").getBytes());
                     }
                 }
             }
@@ -105,6 +114,7 @@ public class VirtualClient extends GSetup {
     }
 
     private boolean updateImgByMessage(String message) {
+//        System.out.println(message);
         if(message.startsWith("ge ~s")) {
             message = message.substring(6);
 //            System.out.println(message);
@@ -235,7 +245,14 @@ public class VirtualClient extends GSetup {
     public void execute() {
         boolean is = true;
         if(lastMessage != null) {
-            is = updateImgByMessage(lastMessage);
+//            is = updateImgByMessage(lastMessage);
+            String[] methods = lastMessage.split("\\\\");
+//            System.out.println(lastMessage);
+//            System.out.println(methods.length);
+            drawingImg.fillRectangle(0,0,getFrameWidth(), getFrameHeight(), defaultBackground);
+            for(int i = 0; i < methods.length-1; i++) {
+                updateImgByMessage(methods[i]);
+            }
         }
         if(drawingImg != null && is) {
             lastFrame = new GImage(drawingImg);

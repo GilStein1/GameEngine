@@ -16,10 +16,12 @@ public abstract class VirtualGSetup{
     private int yOnScreen;
     private int canvasX;
     private int canvasY;
+    private boolean leftClick;
     private int port;
     private Queue<String> methods;
     private Queue<String> requests;
     private Thread tcpHandler;
+    private String methodStr;
 
     public abstract void initialize();
     public abstract void execute();
@@ -35,24 +37,38 @@ public abstract class VirtualGSetup{
         yOnScreen = 0;
         canvasX = 0;
         canvasY = 0;
+        leftClick = false;
         methods = new Queue<>();
+        methodStr = "";
         requests = new Queue<>();
         makeConnection();
         tcpHandler = new Thread(() -> {
+            OutputStream out;
+            BufferedReader in;
+            try {
+                tcpSocket = new Socket(clientAddress, port + 1);
+                out = tcpSocket.getOutputStream();
+                in = new BufferedReader(new InputStreamReader(tcpSocket.getInputStream()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             while (true) {
                 if(!requests.isEmpty()) {
                     String message = requests.head();
+//                    System.out.println(message);
                     requests.remove();
                     try {
-                        tcpSocket = new Socket(clientAddress, port + 1);
-//                        System.out.println("aright, connected");
-                        OutputStream out = tcpSocket.getOutputStream();
+//                        tcpSocket = new Socket(clientAddress, port + 1);
+//                        OutputStream out = tcpSocket.getOutputStream();
+//                        System.out.println("writing message");
                         out.write((message + "\n").getBytes());
-//                        System.out.println("aright, sent");
-                        BufferedReader in = new BufferedReader(new InputStreamReader(tcpSocket.getInputStream()));
+//                        System.out.println("waiting for message");
+//                        BufferedReader in = new BufferedReader(new InputStreamReader(tcpSocket.getInputStream()));
                         handelTcp(in.readLine());
-                        tcpSocket.close();
+//                        System.out.println("got message");
+//                        tcpSocket.close();
                     } catch (IOException ignored) {
+//                        System.out.println("there is an error");
                     }
                 }
             }
@@ -82,6 +98,11 @@ public abstract class VirtualGSetup{
                     String temp = message.substring(message.indexOf("|")+2);
                     String[] vars = temp.split("~");
                     yOnScreen = Integer.parseInt(vars[0].substring(2));
+                }
+                case "lc|" -> {
+                    String temp = message.substring(message.indexOf("|")+2);
+                    String[] vars = temp.split("~");
+                    leftClick = Boolean.parseBoolean(vars[0].substring(2));
                 }
             }
         }
@@ -115,20 +136,36 @@ public abstract class VirtualGSetup{
             methods.insert("ge ~s ~exStart");
             execute();
             methods.insert("ge ~s ~exEnd");
-            while (!methods.isEmpty()) {
-                try {
-                    String method = methods.head();
-                    DatagramPacket sendMethod = new DatagramPacket(method.getBytes(), method.length(), clientAddress, clientPort);
-                    udpSocket.send(sendMethod);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                methods.remove();
+//            System.out.println(methodStr.split("\\\\").length);
+            String method = methodStr.substring(0);
+//            System.out.println(method.getBytes().length);
+            System.out.println(method);
+            try {
+                DatagramPacket sendMethod = new DatagramPacket(method.getBytes(), method.length(), clientAddress, clientPort);
+                udpSocket.send(sendMethod);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
+            methodStr = "";
+//            while (!methods.isEmpty()) {
+//                try {
+////                    String method = methods.head();
+////                    String method = "";
+////                    while (!methods.isEmpty()) {
+////                        method += methods.remove() + "&&";
+////                    }
+//                    DatagramPacket sendMethod = new DatagramPacket(method.getBytes(), method.length(), clientAddress, clientPort);
+//                    udpSocket.send(sendMethod);
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+////                methods.remove();
+//            }
         }
     }
     public int xOnCanvas() {
         requests.insert("ge ~s ~xoc");
+//        System.out.println("put x in queue");
         return xOnScreen;
     }
     public int yOnCanvas() {
@@ -136,23 +173,47 @@ public abstract class VirtualGSetup{
         return yOnScreen;
     }
 
+    public boolean leftClick() {
+        requests.insert("ge ~s ~lc");
+        return leftClick;
+    }
+
     public void drawEllipse(int x, int y, int width, int height, Color color) {
-        methods.insert("ge ~s ~drEll|~x:" + x + "~y:" + y + "~w:" + width + "~h:" + height + "~c:" + color.getRGB());
+        if(!methodStr.isEmpty()) {
+            methodStr += "\\\\";
+        }
+        methodStr += "ge ~s ~drEll|~x:" + x + "~y:" + y + "~w:" + width + "~h:" + height + "~c:" + color.getRGB();
+//        methods.insert("ge ~s ~drEll|~x:" + x + "~y:" + y + "~w:" + width + "~h:" + height + "~c:" + color.getRGB());
     }
 
     public void fillEllipse(int x, int y, int width, int height, Color color) {
-        methods.insert("ge ~s ~flEll|~x:" + x + "~y:" + y + "~w:" + width + "~h:" + height + "~c:" + color.getRGB());
+        if(!methodStr.isEmpty()) {
+            methodStr += "\\\\";
+        }
+        methodStr += "ge ~s ~flEll|~x:" + x + "~y:" + y + "~w:" + width + "~h:" + height + "~c:" + color.getRGB();
+//        methods.insert("ge ~s ~flEll|~x:" + x + "~y:" + y + "~w:" + width + "~h:" + height + "~c:" + color.getRGB());
     }
 
     public void drawRectangle(int x, int y, int width, int height, Color color) {
-        methods.insert("ge ~s ~drRec|~x:" + x + "~y:" + y + "~w:" + width + "~h:" + height + "~c:" + color.getRGB());
+        if(!methodStr.isEmpty()) {
+            methodStr += "\\\\";
+        }
+        methodStr += "ge ~s ~drRec|~x:" + x + "~y:" + y + "~w:" + width + "~h:" + height + "~c:" + color.getRGB();
+//        methods.insert("ge ~s ~drRec|~x:" + x + "~y:" + y + "~w:" + width + "~h:" + height + "~c:" + color.getRGB());
     }
 
     public void fillRectangle(int x, int y, int width, int height, Color color) {
-        methods.insert("ge ~s ~flRec|~x:" + x + "~y:" + y + "~w:" + width + "~h:" + height + "~c:" + color.getRGB());
+        if(!methodStr.isEmpty()) {
+            methodStr += "\\\\";
+        }
+        methodStr += "ge ~s ~flRec|~x:" + x + "~y:" + y + "~w:" + width + "~h:" + height + "~c:" + color.getRGB();
+//        methods.insert("ge ~s ~flRec|~x:" + x + "~y:" + y + "~w:" + width + "~h:" + height + "~c:" + color.getRGB());
     }
 
     public void drawPolygon(int[] x, int[] y, Color color) {
+        if(!methodStr.isEmpty()) {
+            methodStr += "\\\\";
+        }
         String xVal = "";
         for(int i = 0; i < x.length; i++) {
             xVal += x[i] + ((i < x.length-1)? "," : "");
@@ -161,10 +222,14 @@ public abstract class VirtualGSetup{
         for(int i = 0; i < x.length; i++) {
             yVal += y[i] + ((i < y.length-1)? "," : "");
         }
-        methods.insert("ge ~s ~drPol|~x:" + xVal + "~y:" + yVal + "~c:" + color.getRGB());
+        methodStr += "ge ~s ~drPol|~x:" + xVal + "~y:" + yVal + "~c:" + color.getRGB();
+//        methods.insert("ge ~s ~drPol|~x:" + xVal + "~y:" + yVal + "~c:" + color.getRGB());
     }
 
     public void fillPolygon(int[] x, int[] y, Color color) {
+        if(!methodStr.isEmpty()) {
+            methodStr += "\\\\";
+        }
         String xVal = "";
         for(int i = 0; i < x.length; i++) {
             xVal += x[i] + ((i < x.length-1)? "," : "");
@@ -173,11 +238,16 @@ public abstract class VirtualGSetup{
         for(int i = 0; i < x.length; i++) {
             yVal += y[i] + ((i < y.length-1)? "," : "");
         }
-        methods.insert("ge ~s ~flPol|~x:" + xVal + "~y:" + yVal + "~c:" + color.getRGB());
+        methodStr += "ge ~s ~flPol|~x:" + xVal + "~y:" + yVal + "~c:" + color.getRGB();
+//        methods.insert("ge ~s ~flPol|~x:" + xVal + "~y:" + yVal + "~c:" + color.getRGB());
     }
 
     public void drawLine(int x1, int y1, int x2, int y2, Color color) {
-        methods.insert("ge ~s ~drLine|~x1:" + x1 + "~y1:" + y1 + "~x2:" + x2 + "~y2:" + y2 + "~c:" + color.getRGB());
+        if(!methodStr.isEmpty()) {
+            methodStr += "\\\\";
+        }
+        methodStr += "ge ~s ~drLine|~x1:" + x1 + "~y1:" + y1 + "~x2:" + x2 + "~y2:" + y2 + "~c:" + color.getRGB();
+//        methods.insert("ge ~s ~drLine|~x1:" + x1 + "~y1:" + y1 + "~x2:" + x2 + "~y2:" + y2 + "~c:" + color.getRGB());
     }
     public void drawText(int x, int y, String text, Color color) {
         methods.insert("ge ~s ~drTxt|~x:" + x + "~y:" + y + "~t:" + text + "~c:" + color.getRGB());
