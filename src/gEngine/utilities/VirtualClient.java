@@ -68,19 +68,9 @@ public class VirtualClient extends GSetup {
 
             while (true) {
                 try {
-//                    System.out.println("waiting for message");
-//                    serverSocket = new ServerSocket((int)SetupManager.pullFromPool("portOfHost") + 1);
-//                    clientSocket = serverSocket.accept();
-//                    in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-//                    out = new DataOutputStream(clientSocket.getOutputStream());
                     String message = in.readLine();
-//                    System.out.println("got message");
                     handelTCPRequest(out, message);
                     Thread.sleep(5);
-//                    serverSocket.close();
-//                    clientSocket.close();
-//                    in.close();
-//                    out.close();
                 }
                 catch (IOException ignored) {
                 } catch (InterruptedException e) {
@@ -114,25 +104,21 @@ public class VirtualClient extends GSetup {
                         String response = "ge ~c ~rc|~a:" + rightClick();
                         outputStream.write((response + "\n").getBytes());
                     }
+                    case "lk" -> {
+                        String response = "ge ~c ~lk|~k:" + lastKey();
+                        outputStream.write((response + "\n").getBytes());
+                    }
                 }
             }
             catch (IOException ignored) {}
         }
     }
 
-    private boolean updateImgByMessage(String message) {
-//        System.out.println(message);
+    private void updateImgByMessage(String message) {
         if(message.startsWith("ge ~s")) {
             message = message.substring(6);
-//            System.out.println(message);
             String[] parts = message.split("~");
-//            System.out.println(parts[1]);
             switch (parts[1]) {
-                case "exStart" -> {
-                    drawingImg = new GImage(getFrameWidth(),getFrameHeight());
-//                    System.out.println("yes");
-                    return false;
-                }
                 case "drEll|" -> {
                     if(drawingImg != null) {
                         String temp = message.substring(message.indexOf("|")+2);
@@ -240,12 +226,8 @@ public class VirtualClient extends GSetup {
                         );
                     }
                 }
-                default -> {
-                    return false;
-                }
             }
         }
-        return true;
     }
 
     @Override
@@ -256,6 +238,9 @@ public class VirtualClient extends GSetup {
             String[] methods = lastMessage.split("\\\\");
 //            System.out.println(lastMessage);
 //            System.out.println(methods.length);
+            if(getFrameWidth() != drawingImg.getWidth() || getFrameHeight() != drawingImg.getHeight()) {
+                drawingImg = new GImage(getFrameWidth(), getFrameHeight());
+            }
             drawingImg.fillRectangle(0,0,getFrameWidth(), getFrameHeight(), defaultBackground);
             for(int i = 0; i < methods.length; i++) {
                 updateImgByMessage(methods[i]);

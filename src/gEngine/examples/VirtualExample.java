@@ -104,7 +104,7 @@ public class VirtualExample extends VirtualGSetup {
         for (int i = 1; i < arr.length + 1; i++) {
             arr[i - 1] = new Vec2D((int) (points.get(i).x + 900 / 2), (int) (600 / 2 - points.get(i).y));
         }
-//        fillPolygon(Color.BLUE, arr);
+        fillPolygon(Color.BLUE, arr);
         if (isStillHeld) {
             drawLine(xOnCanvas(), yOnCanvas(), (int) (points.get(0).x + 900 / 2), (int) (600 / 2 - points.get(0).y), Color.BLACK);
         }
@@ -252,13 +252,13 @@ public class VirtualExample extends VirtualGSetup {
             fillShape();
         }
 
-//        if(lastKey() == KeyEvent.VK_E && eNoSpam) {
-//            eNoSpam = false;
-//            isTransparent = !isTransparent;
-//        }
-//        else if(lastKey() == -1 && !eNoSpam) {
-//            eNoSpam = true;
-//        }
+        if(lastKey() == KeyEvent.VK_E && eNoSpam) {
+            eNoSpam = false;
+            isTransparent = !isTransparent;
+        }
+        else if(lastKey() == -1 && !eNoSpam) {
+            eNoSpam = true;
+        }
 
     }
 

@@ -18,10 +18,12 @@ public abstract class VirtualGSetup{
     private int canvasY;
     private boolean leftClick;
     private boolean rightClick;
+    private int lastKey;
     private boolean xOnScreenValueUpdate;
     private boolean yOnScreenValueUpdate;
     private boolean leftClickValueUpdate;
     private boolean rightClickValueUpdate;
+    private boolean lastKeyValueUpdate;
     private int port;
     private Queue<String> methods;
     private Queue<String> requests;
@@ -47,6 +49,7 @@ public abstract class VirtualGSetup{
         canvasY = 0;
         leftClick = false;
         rightClick = false;
+        lastKey = -1;
         resetAllTcpCalledValues();
         methods = new Queue<>();
         methodStr = "";
@@ -119,6 +122,11 @@ public abstract class VirtualGSetup{
                     String[] vars = temp.split("~");
                     rightClick = Boolean.parseBoolean(vars[0].substring(2));
                 }
+                case "lk|" -> {
+                    String temp = message.substring(message.indexOf("|")+2);
+                    String[] vars = temp.split("~");
+                    lastKey = Integer.parseInt(vars[0].substring(2));
+                }
             }
         }
     }
@@ -151,9 +159,10 @@ public abstract class VirtualGSetup{
         yOnScreenValueUpdate = true;
         leftClickValueUpdate = true;
         rightClickValueUpdate = true;
+        lastKeyValueUpdate = true;
     }
 
-    public void tick() {
+    private void tick() {
         if(madeAConnection) {
             methods.insert("ge ~s ~exStart");
             execute();
@@ -176,10 +185,7 @@ public abstract class VirtualGSetup{
     }
 
     public double deltaTime() {
-        if(deltaTime > 0.1) {
-            return 0;
-        }
-        return deltaTime;
+        return Math.min(deltaTime, 0.01);
     }
 
     public int xOnCanvas() {
@@ -211,6 +217,14 @@ public abstract class VirtualGSetup{
             rightClickValueUpdate = false;
         }
         return rightClick;
+    }
+
+    public int lastKey() {
+        if(lastKeyValueUpdate) {
+            requests.insert("ge ~s ~lk");
+            lastKeyValueUpdate = false;
+        }
+        return lastKey;
     }
 
     public void drawEllipse(int x, int y, int width, int height, Color color) {
@@ -261,6 +275,16 @@ public abstract class VirtualGSetup{
 //        methods.insert("ge ~s ~drPol|~x:" + xVal + "~y:" + yVal + "~c:" + color.getRGB());
     }
 
+    public void drawPolygon(Color color, Vec2D... points) {
+        int[] x = new int[points.length];
+        int[] y = new int[points.length];
+        for (int i = 0; i < points.length; i++) {
+            x[i] = (int) points[i].x;
+            y[i] = (int) points[i].y;
+        }
+        drawPolygon(x,y,color);
+    }
+
     public void fillPolygon(int[] x, int[] y, Color color) {
         if(!methodStr.isEmpty()) {
             methodStr += "\\\\";
@@ -275,6 +299,16 @@ public abstract class VirtualGSetup{
         }
         methodStr += "ge ~s ~flPol|~x:" + xVal + "~y:" + yVal + "~c:" + color.getRGB();
 //        methods.insert("ge ~s ~flPol|~x:" + xVal + "~y:" + yVal + "~c:" + color.getRGB());
+    }
+
+    public void fillPolygon(Color color, Vec2D... points) {
+        int[] x = new int[points.length];
+        int[] y = new int[points.length];
+        for (int i = 0; i < points.length; i++) {
+            x[i] = (int) points[i].x;
+            y[i] = (int) points[i].y;
+        }
+        fillPolygon(x,y,color);
     }
 
     public void drawLine(int x1, int y1, int x2, int y2, Color color) {
