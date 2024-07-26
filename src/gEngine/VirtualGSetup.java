@@ -31,6 +31,7 @@ public abstract class VirtualGSetup{
     private String methodStr;
     private long lastTime;
     private double deltaTime;
+    private boolean hasInitialized;
 
     public abstract void initialize();
     public abstract void execute();
@@ -42,6 +43,7 @@ public abstract class VirtualGSetup{
     }
 
     private void init() {
+        hasInitialized = false;
         lastTime = System.nanoTime();
         xOnScreen = 0;
         yOnScreen = 0;
@@ -55,6 +57,14 @@ public abstract class VirtualGSetup{
         methodStr = "";
         requests = new Queue<>();
         makeConnection();
+        initialize();
+        try {
+            DatagramPacket sendMethod = new DatagramPacket(methodStr.getBytes(), methodStr.length(), clientAddress, clientPort);
+            udpSocket.send(sendMethod);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        methodStr = "";
         tcpHandler = new Thread(() -> {
             OutputStream out;
             BufferedReader in;
@@ -87,7 +97,6 @@ public abstract class VirtualGSetup{
             }
         });
         tcpHandler.start();
-        initialize();
         Thread t = new Thread(() -> {
             while (true) {
                 tick();
@@ -164,6 +173,10 @@ public abstract class VirtualGSetup{
 
     private void tick() {
         if(madeAConnection) {
+//            if(!hasInitialized) {
+//                initialize();
+//                hasInitialized = true;
+//            }
             methods.insert("ge ~s ~exStart");
             execute();
             methods.insert("ge ~s ~exEnd");
@@ -225,6 +238,20 @@ public abstract class VirtualGSetup{
             lastKeyValueUpdate = false;
         }
         return lastKey;
+    }
+
+    void addToMethodStr(String message) {
+        if(!methodStr.isEmpty()) {
+            methodStr += "\\\\";
+        }
+        methodStr += message;
+    }
+
+    public void drawImage(int x, int y, int width, int height, VirtualGImage image) {
+        if(!methodStr.isEmpty()) {
+            methodStr += "\\\\";
+        }
+        methodStr += "ge ~s ~drImg|~x:" + x + "~y:" + y + "~w:" + width + "~h:" + height + "~id:" + image.getId();
     }
 
     public void drawEllipse(int x, int y, int width, int height, Color color) {
@@ -319,6 +346,9 @@ public abstract class VirtualGSetup{
 //        methods.insert("ge ~s ~drLine|~x1:" + x1 + "~y1:" + y1 + "~x2:" + x2 + "~y2:" + y2 + "~c:" + color.getRGB());
     }
     public void drawText(int x, int y, String text, Color color) {
-        methods.insert("ge ~s ~drTxt|~x:" + x + "~y:" + y + "~t:" + text + "~c:" + color.getRGB());
+        if(!methodStr.isEmpty()) {
+            methodStr += "\\\\";
+        }
+        methodStr += "ge ~s ~drTxt|~x:" + x + "~y:" + y + "~t:" + text + "~c:" + color.getRGB();
     }
 }
