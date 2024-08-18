@@ -43,7 +43,8 @@ public class VirtualExample extends VirtualGSetup {
         relativeToMouse = new ArrayList<>();
         springs = new ArrayList<>();
 
-        img = new VirtualGImage(100,100,this);
+//        img = new VirtualGImage(100,100,this);
+        img = new VirtualGImage("Bird.png",this);
         img.fillRectangle(0,0,100,100,Color.RED);
 //        img = new VirtualGImage("Bird.png", this);
 
@@ -228,6 +229,8 @@ public class VirtualExample extends VirtualGSetup {
 
         double x = xOnCanvas() - 900 / 2.0;
         double y = -(yOnCanvas() - 600 / 2.0);
+
+//        System.out.println("(" + x + "," + y + ")");
 
         boolean isMouseOnShape = Math.abs(points.get(0).x-x) < 80 && Math.abs(points.get(0).y-y) < 80;
 

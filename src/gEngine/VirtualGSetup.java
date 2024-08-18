@@ -27,6 +27,7 @@ public abstract class VirtualGSetup{
     private int port;
     private Queue<String> methods;
     private Queue<String> requests;
+    private Queue<byte[]> byteMessageBuffer;
     private Thread tcpHandler;
     private String methodStr;
     private long lastTime;
@@ -56,6 +57,7 @@ public abstract class VirtualGSetup{
         methods = new Queue<>();
         methodStr = "";
         requests = new Queue<>();
+        byteMessageBuffer = new Queue<>();
         makeConnection();
         initialize();
         try {
@@ -75,6 +77,7 @@ public abstract class VirtualGSetup{
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            boolean isWaiting = false;
             while (true) {
                 if(!requests.isEmpty()) {
                     String message = requests.head();
@@ -84,7 +87,15 @@ public abstract class VirtualGSetup{
 //                        tcpSocket = new Socket(clientAddress, port + 1);
 //                        OutputStream out = tcpSocket.getOutputStream();
 //                        System.out.println("writing message");
-                        out.write((message + "\n").getBytes());
+                        if(isWaiting){
+                            out.write(byteMessageBuffer.remove());
+                            System.out.println("sent that");
+                            isWaiting = false;
+                        }
+                        else {
+                            out.write((message + "\n").getBytes());
+                            isWaiting = message.contains("ge ~s ~wfb");
+                        }
 //                        System.out.println("waiting for message");
 //                        BufferedReader in = new BufferedReader(new InputStreamReader(tcpSocket.getInputStream()));
                         handelTcp(in.readLine());
@@ -161,6 +172,13 @@ public abstract class VirtualGSetup{
         clientAddress = udpPacket.getAddress();
         clientPort = udpPacket.getPort();
 //        System.out.println("yes");
+    }
+
+    public void insertToTcpRequestByteBuffer(byte[] arr) {
+        byteMessageBuffer.insert(arr);
+    }
+    public void insertTcpRequests(String message) {
+        requests.insert(message);
     }
 
     public void resetAllTcpCalledValues() {

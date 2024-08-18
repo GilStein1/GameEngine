@@ -4,7 +4,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class VirtualGImage{
@@ -16,6 +15,28 @@ public class VirtualGImage{
         this.virtualGSetup = virtualGSetup;
         this.id = this.hashCode();
         virtualGSetup.addToMethodStr("ge ~s ~mkImg|~w:" + width + "~h:" + height + "~id:" + id);
+    }
+
+    public VirtualGImage(String path, VirtualGSetup virtualGSetup) {
+        this.virtualGSetup = virtualGSetup;
+        this.id = this.hashCode();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(new GImage(path).getImage(), "png", baos);
+        } catch (IOException ignored) {}
+        byte[] imageBytes = baos.toByteArray();
+
+//        for(byte b : imageBytes) {
+//            System.out.println(b);
+//        }
+
+//        byte[] bytesToSend = new byte[imageBytes.length + 1];
+//        for(int i = 0; i < imageBytes.length; i++) {
+//            bytesToSend[i] = imageBytes[i];
+//        }
+//        bytesToSend[bytesToSend.length-1] = -1;
+        virtualGSetup.insertToTcpRequestByteBuffer(imageBytes);
+        virtualGSetup.insertTcpRequests("ge ~s ~wfb ~mkImg|~id:" + id);
     }
 
     public static void handleDrawingCommands(HashMap<Integer, GImage> images, String command) {

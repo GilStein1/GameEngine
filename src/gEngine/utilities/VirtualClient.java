@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 public class VirtualClient extends GSetup {
@@ -76,26 +77,51 @@ public class VirtualClient extends GSetup {
         tcpServer = new Thread(() -> {
             DataOutputStream out = null;
             BufferedReader in = null;
+            InputStreamReader inputStreamReader = null;
             Socket clientSocket = null;
+            InputStream inputStream = null;
 
             try {
                 serverSocket = new ServerSocket((int)SetupManager.pullFromPool("portOfHost") + 1);
                 clientSocket = serverSocket.accept();
 //                System.out.println("connected");
-                in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                inputStream = clientSocket.getInputStream();
+                inputStreamReader = new InputStreamReader(inputStream);
+                in = new BufferedReader(inputStreamReader);
                 out = new DataOutputStream(clientSocket.getOutputStream());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
+            boolean isWaiting = false;
+            int id = -1;
             while (true) {
                 try {
-                    String message = in.readLine();
-                    handelTCPRequest(out, message);
+                    if(isWaiting) {
+                        isWaiting = false;
+                        byte[] buffer = new byte[65507];
+                        int bytesRead = inputStream.read(buffer);
+                        byte[] receivedBytes = new byte[bytesRead];
+                        System.arraycopy(buffer, 0, receivedBytes, 0, bytesRead);
+                        ByteArrayInputStream bais = new ByteArrayInputStream(receivedBytes);
+                        BufferedImage imgBack = ImageIO.read(bais);
+                        images.put(id, new GImage(imgBack));
+                        out.write(("none\n").getBytes());
+                    }
+                    else {
+                        String message = in.readLine();
+                        isWaiting = message.contains("ge ~s ~wfb");
+                        if(isWaiting) {
+                            String idStr = message.substring(message.indexOf("id:") + 3);
+                            id = Integer.parseInt(idStr);
+                        }
+                        handelTCPRequest(out, message);
+                    }
+
                     Thread.sleep(5);
                 }
                 catch (IOException ignored) {
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
@@ -104,10 +130,10 @@ public class VirtualClient extends GSetup {
     }
 
     private void handelTCPRequest(DataOutputStream outputStream, String message) {
-//        System.out.println("gotHere");
         if(message.startsWith("ge ~s")) {
             message = message.substring(6);
             String[] parts = message.split("~");
+//            System.out.println(parts[1]);
             try {
                 switch (parts[1]) {
                     case "xoc" -> {
@@ -129,6 +155,9 @@ public class VirtualClient extends GSetup {
                     case "lk" -> {
                         String response = "ge ~c ~lk|~k:" + lastKey();
                         outputStream.write((response + "\n").getBytes());
+                    }
+                    default -> {
+                        outputStream.write(("none\n").getBytes());
                     }
                 }
             }
