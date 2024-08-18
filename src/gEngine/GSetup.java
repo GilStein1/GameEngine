@@ -124,74 +124,11 @@ public abstract class GSetup {
         frame = new JFrame();
 
         count = 0;
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
+        KeyboardFocusManager
+                .getCurrentKeyboardFocusManager()
+                .addKeyEventDispatcher(new Handlers.GKeyEventHandled());
 
-            if (e.getID() == KeyEvent.KEY_TYPED) {
-                if (keyTyped != null) {
-                    keyEventsPairs.insert(new KeyAndActionPair(keyTyped, e));
-
-                }
-                for (GTextField t : gTextFields) {
-                    t.typed(e, lastKeyPressed == KeyEvent.VK_BACK_SPACE);
-                }
-            }
-            if (e.getID() == KeyEvent.KEY_PRESSED) {
-                lastKeyPressed = e.getKeyCode();
-                if (keyPressed != null) {
-                    keyEventsPairs.insert(new KeyAndActionPair(keyPressed, e));
-                }
-                lastCharPressed = e.getKeyChar();
-            }
-            if (e.getID() == KeyEvent.KEY_RELEASED) {
-                if (e.getKeyCode() == lastKeyPressed) {
-                    lastKeyPressed = -1;
-                }
-                if (keyReleased != null) {
-                    keyEventsPairs.insert(new KeyAndActionPair(keyReleased, e));
-                }
-                if (e.getKeyChar() == lastCharPressed) {
-                    lastCharPressed = '~';
-                }
-            }
-            return false;
-        });
-
-        frame.addWindowListener(new WindowListener() {
-            @Override
-            public void windowOpened(WindowEvent e) {
-
-            }
-
-            @Override
-            public void windowClosing(WindowEvent e) {
-                lastFunction();
-            }
-
-            @Override
-            public void windowClosed(WindowEvent e) {
-                lastFunction();
-            }
-
-            @Override
-            public void windowIconified(WindowEvent e) {
-
-            }
-
-            @Override
-            public void windowDeiconified(WindowEvent e) {
-
-            }
-
-            @Override
-            public void windowActivated(WindowEvent e) {
-
-            }
-
-            @Override
-            public void windowDeactivated(WindowEvent e) {
-
-            }
-        });
+        frame.addWindowListener(new Handlers.GWindowHandler());
 
         isPainting = false;
 
@@ -296,58 +233,7 @@ public abstract class GSetup {
         frame.add(panel);
         hasInitialized = true;
 
-        frame.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                for (GFrameTextField textField : frameTextFields) {
-                    textField.isPressed();
-                    panel.remove(textField.getJTextField());
-                    panel.add(textField.getJTextField());
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.getButton() == 1) {
-                    leftMouseClicked = true;
-                    for (GButton b : gButtons) {
-                        b.setPressed(true);
-                    }
-                    for (GTextField t : gTextFields) {
-                        t.setPressed(true);
-                    }
-                }
-                if (e.getButton() == 3) {
-                    rightMouseClicked = true;
-                }
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.getButton() == 1) {
-                    leftMouseClicked = false;
-                    for (GButton b : gButtons) {
-                        b.setPressed(false);
-                    }
-                    for (GTextField t : gTextFields) {
-                        t.setPressed(false);
-                    }
-                }
-                if (e.getButton() == 3) {
-                    rightMouseClicked = false;
-                }
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                mouseOnFrame = true;
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                mouseOnFrame = false;
-            }
-        });
+        frame.addMouseListener(new Handlers.GMouseListener());
 
         if (frameIcon != null) {
             frame.setIconImage(frameIcon);
@@ -400,6 +286,62 @@ public abstract class GSetup {
         });
 
         executed.start();
+    }
+
+    KeyEventSupplier getKeyTyped() {
+        return keyTyped;
+    }
+
+    KeyEventSupplier getKeyPressed() {
+        return keyPressed;
+    }
+
+    KeyEventSupplier getKeyReleased() {
+        return keyReleased;
+    }
+
+    void setLastKeyPressed(int lastKeyPressed) {
+        this.lastKeyPressed = lastKeyPressed;
+    }
+
+    void setLastCharPressed(char lastCharPressed) {
+        this.lastCharPressed = lastCharPressed;
+    }
+
+    void setMouseOnFrame(boolean mouseOnFrame) {
+        this.mouseOnFrame = mouseOnFrame;
+    }
+
+    void setLeftMouseClicked(boolean leftMouseClicked) {
+        this.leftMouseClicked = leftMouseClicked;
+    }
+
+    void setRightMouseClicked(boolean rightMouseClicked) {
+        this.rightMouseClicked = rightMouseClicked;
+    }
+
+    void insertKeyAndActionPair(KeyAndActionPair pair) {
+        keyEventsPairs.insert(pair);
+    }
+
+    void addToPanel(JComponent component) {
+        panel.add(component);
+    }
+
+    void removeFromPanel(JComponent component) {
+        panel.remove(component);
+    }
+
+    public ArrayList<GTextField> getGTextFields() {
+        return (ArrayList<GTextField>)gTextFields;
+    }
+
+    public ArrayList<GFrameTextField> getGFrameTextFields() {
+        return (ArrayList<GFrameTextField>)frameTextFields;
+    }
+
+    public ArrayList<GButton> getGButtons() {
+        return (ArrayList<GButton>)gButtons;
     }
 
     public GSetup drawShapesFaster(boolean drawFaster) {

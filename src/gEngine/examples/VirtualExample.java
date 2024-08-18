@@ -1,14 +1,11 @@
 package gEngine.examples;
 
 import gEngine.*;
-
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 public class VirtualExample extends VirtualGSetup {
-
-//    double x = 0;
 
     public VirtualExample(int port) {
         super(port);
@@ -273,6 +270,8 @@ public class VirtualExample extends VirtualGSetup {
     public void execute() {
 //        VirtualGImage img = new VirtualGImage(100,100,this);
 //        img.fillEllipse(0,0,100,100,Color.BLUE);
+        SetupManager.pushValueToPool(xOnCanvas(),"x");
+        SetupManager.pushValueToPool(yOnCanvas(),"y");
         updateMouseVector();
         rotatePointer();
         makeSpringWhenLeftClicked();

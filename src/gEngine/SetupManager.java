@@ -2,6 +2,7 @@ package gEngine;
 
 import gEngine.utilities.ExecutableBuilder;
 import gEngine.utilities.VirtualClient;
+import gEngine.utilities.VirtualRunThread;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,6 +59,10 @@ public class SetupManager {
         fps.add(fpsPanel);
     }
 
+    public static void addToVirtualQueue(Class<? extends VirtualGSetup> virtualGSetup, int port) {
+        new VirtualRunThread(virtualGSetup, port);
+    }
+
     public static void startVirtualClient(String address, int port) {
         pushValueToPool(address, "ipOfHost");
         pushValueToPool(port, "portOfHost");
@@ -96,11 +101,9 @@ public class SetupManager {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-
             }
 
         }
-
 
     }
     public static SetupManager getInstance() {
@@ -169,7 +172,7 @@ public class SetupManager {
     void showFpsGraph(boolean is) {
         showFpsGraph = is;
     }
-    GSetup getSetup() {
+    public GSetup getSetup() {
         return setup;
     }
     public static class Debug {

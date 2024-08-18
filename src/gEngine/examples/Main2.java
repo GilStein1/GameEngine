@@ -14,10 +14,7 @@ public class Main2 extends GSetup {
 
     @Override
     public void initialize() {
-        Thread t = new Thread(() -> {
-            VirtualExample ve = new VirtualExample(8080);
-        });
-        t.start();
+        SetupManager.addToVirtualQueue(VirtualExample.class, 8080);
         SetupManager.pushValueToPool(0,"x");
         SetupManager.pushValueToPool(0,"y");
     }

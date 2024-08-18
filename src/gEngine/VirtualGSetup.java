@@ -37,9 +37,8 @@ public abstract class VirtualGSetup{
     public abstract void initialize();
     public abstract void execute();
     public abstract boolean end();
-    public VirtualGSetup(int port) {
+    protected VirtualGSetup(int port) {
         this.port = port;
-//        SetupManager.addTick(this);
         init();
     }
 
@@ -81,28 +80,20 @@ public abstract class VirtualGSetup{
             while (true) {
                 if(!requests.isEmpty()) {
                     String message = requests.head();
-//                    System.out.println(message);
                     requests.remove();
                     try {
-//                        tcpSocket = new Socket(clientAddress, port + 1);
-//                        OutputStream out = tcpSocket.getOutputStream();
-//                        System.out.println("writing message");
                         if(isWaiting){
                             out.write(byteMessageBuffer.remove());
-                            System.out.println("sent that");
                             isWaiting = false;
                         }
                         else {
                             out.write((message + "\n").getBytes());
                             isWaiting = message.contains("ge ~s ~wfb");
                         }
-//                        System.out.println("waiting for message");
-//                        BufferedReader in = new BufferedReader(new InputStreamReader(tcpSocket.getInputStream()));
                         handelTcp(in.readLine());
-//                        System.out.println("got message");
-//                        tcpSocket.close();
-                    } catch (IOException ignored) {
-//                        System.out.println("there is an error");
+                    }
+                    catch (IOException ignored) {
+
                     }
                 }
             }
@@ -117,7 +108,6 @@ public abstract class VirtualGSetup{
     }
 
     private void handelTcp(String message) {
-//        System.out.println("here");
         if(message.startsWith("ge ~c")) {
             message = message.substring(6);
             String[] parts = message.split("~");
@@ -171,7 +161,6 @@ public abstract class VirtualGSetup{
         }
         clientAddress = udpPacket.getAddress();
         clientPort = udpPacket.getPort();
-//        System.out.println("yes");
     }
 
     public void insertToTcpRequestByteBuffer(byte[] arr) {
@@ -191,18 +180,11 @@ public abstract class VirtualGSetup{
 
     private void tick() {
         if(madeAConnection) {
-//            if(!hasInitialized) {
-//                initialize();
-//                hasInitialized = true;
-//            }
             methods.insert("ge ~s ~exStart");
             execute();
             methods.insert("ge ~s ~exEnd");
             resetAllTcpCalledValues();
-//            System.out.println(methodStr.split("\\\\").length);
             String method = methodStr.substring(0);
-//            System.out.println(method.getBytes().length);
-//            System.out.println(method);
             try {
                 DatagramPacket sendMethod = new DatagramPacket(method.getBytes(), method.length(), clientAddress, clientPort);
                 udpSocket.send(sendMethod);
