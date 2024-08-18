@@ -14,6 +14,8 @@ public abstract class VirtualGSetup{
     private int clientPort;
     private int xOnScreen;
     private int yOnScreen;
+    private int frameWidth;
+    private int frameHeight;
     private int canvasX;
     private int canvasY;
     private boolean leftClick;
@@ -23,6 +25,8 @@ public abstract class VirtualGSetup{
     private boolean yOnScreenValueUpdate;
     private boolean leftClickValueUpdate;
     private boolean rightClickValueUpdate;
+    private boolean screenWidthValueUpdate;
+    private boolean screenHeightValueUpdate;
     private boolean lastKeyValueUpdate;
     private int port;
     private Queue<String> methods;
@@ -33,20 +37,24 @@ public abstract class VirtualGSetup{
     private long lastTime;
     private double deltaTime;
     private boolean hasInitialized;
+    private boolean shutDown;
 
     public abstract void initialize();
     public abstract void execute();
     public abstract boolean end();
-    protected VirtualGSetup(int port) {
+    public VirtualGSetup(int port) {
         this.port = port;
         init();
     }
 
     private void init() {
+        shutDown = false;
         hasInitialized = false;
         lastTime = System.nanoTime();
         xOnScreen = 0;
         yOnScreen = 0;
+        frameWidth = 900;
+        frameHeight = 600;
         canvasX = 0;
         canvasY = 0;
         leftClick = false;
@@ -73,14 +81,15 @@ public abstract class VirtualGSetup{
                 tcpSocket = new Socket(clientAddress, port + 1);
                 out = tcpSocket.getOutputStream();
                 in = new BufferedReader(new InputStreamReader(tcpSocket.getInputStream()));
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new RuntimeException(e);
             }
             boolean isWaiting = false;
             while (true) {
                 if(!requests.isEmpty()) {
                     String message = requests.head();
-                    requests.remove();
+//                    System.out.println(requests.remove());
                     try {
                         if(isWaiting){
                             out.write(byteMessageBuffer.remove());
@@ -89,6 +98,7 @@ public abstract class VirtualGSetup{
                         else {
                             out.write((message + "\n").getBytes());
                             isWaiting = message.contains("ge ~s ~wfb");
+                            requests.remove();
                         }
                         handelTcp(in.readLine());
                     }
@@ -121,6 +131,16 @@ public abstract class VirtualGSetup{
                     String temp = message.substring(message.indexOf("|")+2);
                     String[] vars = temp.split("~");
                     yOnScreen = Integer.parseInt(vars[0].substring(2));
+                }
+                case "fw|" -> {
+                    String temp = message.substring(message.indexOf("|")+2);
+                    String[] vars = temp.split("~");
+                    frameWidth = Integer.parseInt(vars[0].substring(2));
+                }
+                case "fh|" -> {
+                    String temp = message.substring(message.indexOf("|")+2);
+                    String[] vars = temp.split("~");
+                    frameHeight = Integer.parseInt(vars[0].substring(2));
                 }
                 case "lc|" -> {
                     String temp = message.substring(message.indexOf("|")+2);
@@ -175,12 +195,21 @@ public abstract class VirtualGSetup{
         yOnScreenValueUpdate = true;
         leftClickValueUpdate = true;
         rightClickValueUpdate = true;
+        screenWidthValueUpdate = true;
+        screenHeightValueUpdate = true;
         lastKeyValueUpdate = true;
     }
 
     private void tick() {
         if(madeAConnection) {
             methods.insert("ge ~s ~exStart");
+            shutDown |= end();
+            if(shutDown) {
+                if(!methodStr.isEmpty()) {
+                    methodStr += "\\\\";
+                }
+                methodStr += "ge ~s ~end";
+            }
             execute();
             methods.insert("ge ~s ~exEnd");
             resetAllTcpCalledValues();
@@ -214,6 +243,26 @@ public abstract class VirtualGSetup{
             yOnScreenValueUpdate = false;
         }
         return yOnScreen;
+    }
+
+    public int getFrameWidth() {
+        if(screenWidthValueUpdate) {
+            requests.insert("ge ~s ~fw");
+            screenWidthValueUpdate = false;
+        }
+        return frameWidth;
+    }
+
+    public int getFrameHeight() {
+        if(screenHeightValueUpdate) {
+            requests.insert("ge ~s ~fh");
+            screenHeightValueUpdate = false;
+        }
+        return frameHeight;
+    }
+
+    public void setFullScreen(boolean fullScreen) {
+        insertTcpRequests("ge ~s ~" + (fullScreen? "fullSc" : "smallSc"));
     }
 
     public boolean leftClick() {

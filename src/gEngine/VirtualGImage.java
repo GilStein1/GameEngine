@@ -44,6 +44,19 @@ public class VirtualGImage{
         String[] parts = command.split("~");
         if(images.get(Integer.parseInt(parts[parts.length-1].substring(3))) != null) {
             switch (parts[1])  {
+                case "drImg|" -> {
+                    String temp = command.substring(command.indexOf("|")+2);
+                    String[] vars = temp.split("~");
+                    if(images.containsKey(Integer.parseInt(vars[4].substring(4)))) {
+                        images.get(Integer.valueOf(vars[vars.length-1].substring(3))).drawImage(
+                                Integer.parseInt(vars[0].substring(2)),
+                                Integer.parseInt(vars[1].substring(2)),
+                                Integer.parseInt(vars[2].substring(2)),
+                                Integer.parseInt(vars[3].substring(2)),
+                                images.get(Integer.parseInt(vars[4].substring(4)))
+                        );
+                    }
+                }
                 case "drEll|" -> {
                     String temp = command.substring(command.indexOf("|")+2);
                     String[] vars = temp.split("~");
@@ -194,5 +207,8 @@ public class VirtualGImage{
 
     public void drawText(int x, int y, String text, Color color) {
         virtualGSetup.addToMethodStr("ge ~s ~edImg ~drTxt|~x:" + x + "~y:" + y + "~t:" + text + "~c:" + color.getRGB() + "~id:" + id);
+    }
+    public void drawImage(int x, int y, int width, int height, VirtualGImage image) {
+        virtualGSetup.addToMethodStr("ge ~s ~edImg ~drImg|~x:" + x + "~y:" + y + "~w:" + width + "~h:" + height + "~id2:" + image.getId() + "~id:" + id);
     }
 }

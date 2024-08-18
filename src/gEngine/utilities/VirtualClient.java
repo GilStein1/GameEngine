@@ -24,8 +24,10 @@ public class VirtualClient extends GSetup {
     private String lastMessage;
     private HashMap<Integer, GImage> images;
     private boolean initialized;
+    private boolean endGame;
     @Override
     public void initialize() {
+        endGame = false;
         initialized = false;
         setTitle("virtual client");
         images = new HashMap<>();
@@ -136,12 +138,25 @@ public class VirtualClient extends GSetup {
 //            System.out.println(parts[1]);
             try {
                 switch (parts[1]) {
+                    case "fullSc" -> {
+                        System.out.println("got here2");
+                        setFullScreen(true);
+                        outputStream.write(("ok\n").getBytes());
+                    }
                     case "xoc" -> {
                         String response = "ge ~c ~xoc|~x:" + xOnCanvas();
                         outputStream.write((response + "\n").getBytes());
                     }
                     case "yoc" -> {
                         String response = "ge ~c ~yoc|~y:" + yOnCanvas();
+                        outputStream.write((response + "\n").getBytes());
+                    }
+                    case "fw" -> {
+                        String response = "ge ~c ~fw|~w:" + getFrameWidth();
+                        outputStream.write((response + "\n").getBytes());
+                    }
+                    case "fh" -> {
+                        String response = "ge ~c ~fh|~h:" + getFrameHeight();
                         outputStream.write((response + "\n").getBytes());
                     }
                     case "lc" -> {
@@ -170,6 +185,9 @@ public class VirtualClient extends GSetup {
             message = message.substring(6);
             String[] parts = message.split("~");
             switch (parts[1]) {
+                case "end" -> {
+                    endGame = true;
+                }
                 case "mkImg|" -> {
                     if(drawingImg != null) {
                         String temp = message.substring(message.indexOf("|")+2);
@@ -357,6 +375,6 @@ public class VirtualClient extends GSetup {
 
     @Override
     public boolean end() {
-        return false;
+        return endGame;
     }
 }

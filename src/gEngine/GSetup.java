@@ -472,6 +472,9 @@ public abstract class GSetup {
 
     public void setFullScreen(boolean fullScreen) {
         doFullScreen = fullScreen;
+        if(frame.isVisible()) {
+            frame.setExtendedState(fullScreen? JFrame.MAXIMIZED_BOTH : JFrame.NORMAL);
+        }
     }
 
     public void moveCanvas(int x, int y) {

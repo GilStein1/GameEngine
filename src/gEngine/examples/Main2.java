@@ -14,16 +14,17 @@ public class Main2 extends GSetup {
 
     @Override
     public void initialize() {
-        SetupManager.addToVirtualQueue(VirtualExample.class, 8080);
-        SetupManager.pushValueToPool(0,"x");
-        SetupManager.pushValueToPool(0,"y");
+        SetupManager.addToVirtualQueue(ShootingGameClient.class, 8080);
+//        SetupManager.addToVirtualQueue(VirtualExample.class, 8080);
+//        SetupManager.pushValueToPool(0,"x");
+//        SetupManager.pushValueToPool(0,"y");
     }
 
     @Override
     public void execute() {
 
 
-        drawText((int)SetupManager.pullFromPool("x"),(int)SetupManager.pullFromPool("y"),"mjashgdwjad", Color.BLUE);
+//        drawText((int)SetupManager.pullFromPool("x"),(int)SetupManager.pullFromPool("y"),"mjashgdwjad", Color.BLUE);
 
 //        try {
 //            drawText((int)SetupManager.pullFromPool("x"),(int)SetupManager.pullFromPool("y"),"mjashgdwjad", Color.BLUE);

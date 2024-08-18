@@ -73,6 +73,7 @@ public class AngryFlappy extends GSetup {
         backgroundOffSet = 0;
         speed = 0.7;
         score = 0;
+        setFullScreen(true);
     }
     void restart() {
         start = false;

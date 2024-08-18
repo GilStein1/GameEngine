@@ -41,9 +41,7 @@ public class VirtualExample extends VirtualGSetup {
         springs = new ArrayList<>();
 
 //        img = new VirtualGImage(100,100,this);
-        img = new VirtualGImage("Bird.png",this);
-        img.fillRectangle(0,0,100,100,Color.RED);
-//        img = new VirtualGImage("Bird.png", this);
+        img = new VirtualGImage("Bird.png", this);
 
 //        setFrameSize(900, 600);
 //        drawShapesFaster(true);
@@ -278,7 +276,7 @@ public class VirtualExample extends VirtualGSetup {
         drawLine(0, (int) (600 / 2 - floor), 900, (int) (600 / 2 - floor), Color.BLACK);
         draw();
         physics();
-        drawImage(0,0,200,100,img);
+        drawImage(0,0,100,100,img);
     }
 
     @Override
