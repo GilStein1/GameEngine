@@ -54,13 +54,13 @@ public class RayCaster extends GSetup {
         setResizable(true);
         setBackground(Color.BLACK);
 
-        setSmoothness(Smoothness.VERY_SMOOTH);
+        setSmoothness(gEngine.utilities.Smoothness.VERY_SMOOTH);
 
-        img.setSmoothness(Smoothness.VERY_SMOOTH);
+        img.setSmoothness(gEngine.utilities.Smoothness.VERY_SMOOTH);
         if(fs) {
             img.getGraphics().setStroke(new BasicStroke(3));
         }
-        render.setSmoothness(Smoothness.VERY_SMOOTH);
+        render.setSmoothness(gEngine.utilities.Smoothness.VERY_SMOOTH);
 
         drawShapesFaster(true);
 

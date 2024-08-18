@@ -1,5 +1,6 @@
 package gEngine;
 
+import gEngine.utilities.Smoothness;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -12,7 +13,7 @@ public class GImage {
 
     private BufferedImage img;
     private Graphics2D graphics;
-    private GSetup.Smoothness smoothness = GSetup.Smoothness.NORMAL;
+    private Smoothness smoothness = Smoothness.NORMAL;
     private double angle = 0;
     public GImage(String path) {
 
@@ -28,11 +29,11 @@ public class GImage {
         img = new BufferedImage(width,height,BufferedImage.TYPE_INT_ARGB);
         graphics = img.createGraphics();
     }
-    public void setSmoothness(GSetup.Smoothness smoothness) {
+    public void setSmoothness(Smoothness smoothness) {
         this.smoothness = smoothness;
         updateSmoothness(smoothness,(Graphics2D) graphics);
     }
-    void updateSmoothness(GSetup.Smoothness amount, Graphics2D graphics) {
+    void updateSmoothness(Smoothness amount, Graphics2D graphics) {
         switch (amount) {
             case VERY_SMOOTH -> {
                 graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);

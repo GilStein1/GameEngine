@@ -45,8 +45,8 @@ public abstract class GSetup {
     private KeyEventSupplier keyTyped;
     private KeyEventSupplier keyPressed;
     private KeyEventSupplier keyReleased;
-    private Queue<KeyAndActionPair> keyEventsPairs;
-    private double[] fpsArr;
+    private final Queue<KeyAndActionPair> keyEventsPairs;
+    private final double[] fpsArr;
     private boolean leftMouseClicked = false;
     private boolean rightMouseClicked = false;
     private int xScreen = 0;
@@ -54,13 +54,13 @@ public abstract class GSetup {
     private BufferedImage imgToDrawOn;
     private Graphics graphicsToDrawFrom;
     boolean loadShapesFaster = false;
-    private Smoothness smoothness;
+    private gEngine.utilities.Smoothness smoothness;
     private boolean continueRun;
     private int extendedState;
     private boolean doFullScreen;
     private boolean hasInitialized;
     private int limitedFps;
-    private Robot robot;
+    private final Robot robot;
     private int cursorXOffset = 0;
     private int cursorYOffset = 0;
 
@@ -109,7 +109,7 @@ public abstract class GSetup {
             throw new RuntimeException("illegal use of the class");
         }
 
-        smoothness = Smoothness.NORMAL;
+        smoothness = gEngine.utilities.Smoothness.NORMAL;
         firstMethods = true;
         continueRun = true;
 
@@ -206,7 +206,6 @@ public abstract class GSetup {
 
                 }
                 if ((img.getWidth() != frame.getWidth() || img.getHeight() != frame.getHeight()) && loadShapesFaster) {
-//                    System.out.println("asdwasdw");
                     img = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_ARGB);
                     imgToDrawOn = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_ARGB);
                 }
@@ -288,6 +287,9 @@ public abstract class GSetup {
         executed.start();
     }
 
+    //-------methods in use of the library-------
+    //those methods are not meant to be used by the user
+
     KeyEventSupplier getKeyTyped() {
         return keyTyped;
     }
@@ -343,6 +345,46 @@ public abstract class GSetup {
     public ArrayList<GButton> getGButtons() {
         return (ArrayList<GButton>)gButtons;
     }
+
+    void stop() {
+        continueRun = false;
+    }
+
+    void updateSmoothness(gEngine.utilities.Smoothness amount, Graphics2D graphics) {
+        switch (amount) {
+            case VERY_SMOOTH -> {
+                graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            }
+            case NORMAL -> {
+                graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_DEFAULT);
+                graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT);
+            }
+            case NOT_SMOOTH -> {
+                graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+                graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+            }
+        }
+    }
+
+    private void thingsToDrawLast() {
+        for (GComponent component : componentsToPaintLast) {
+            component.draw(graphics);
+        }
+        for (GTextView textView : textViews) {
+            textView.draw(this);
+        }
+    }
+
+    public void mouseClickedFromOutSide() {
+        if (!mouseOnFrame) {
+            for (GTextField textField : gTextFields) {
+                textField.turnOff();
+            }
+        }
+    }
+
+    //--------------
 
     public GSetup drawShapesFaster(boolean drawFaster) {
         this.loadShapesFaster = drawFaster;
@@ -418,10 +460,6 @@ public abstract class GSetup {
         manager.reDraw();
     }
 
-    void stop() {
-        continueRun = false;
-    }
-
     public void setLimitedFps(int fps) {
         this.limitedFps = fps;
     }
@@ -456,48 +494,33 @@ public abstract class GSetup {
         return frame.getY();
     }
 
+    /**
+     * Takes a screenshot of the screen
+     *
+     * @param x      the x of the screenshot
+     * @param y      the y of the screenshot
+     * @param width  the width of the screenshot
+     * @param height the height of the screenshot
+     * @return a GImage containing the screenshot
+     */
     public GImage getScreenShot(int x, int y, int width, int height) {
         return new GImage(robot.createScreenCapture(new Rectangle(x, y, width, height)));
     }
 
+    /**
+     * @return the JFrame object of the canvas
+     */
     public JFrame getFrame() {
         return frame;
     }
 
-    private void thingsToDrawLast() {
-        for (GComponent component : componentsToPaintLast) {
-            component.draw(graphics);
-        }
-        for (GTextView textView : textViews) {
-            textView.draw(this);
-        }
-    }
-
-    public enum Smoothness {
-        VERY_SMOOTH,
-        NORMAL,
-        NOT_SMOOTH
-    }
-
-    public void setSmoothness(Smoothness smoothness) {
+    /**
+     * Sets a level of smoothness (Anti-Aliasing) of the renderer
+     *
+     * @param smoothness the amount of Anti-Aliasing
+     */
+    public void setSmoothness(gEngine.utilities.Smoothness smoothness) {
         this.smoothness = smoothness;
-    }
-
-    void updateSmoothness(Smoothness amount, Graphics2D graphics) {
-        switch (amount) {
-            case VERY_SMOOTH -> {
-                graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            }
-            case NORMAL -> {
-                graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_DEFAULT);
-                graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT);
-            }
-            case NOT_SMOOTH -> {
-                graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-                graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-            }
-        }
     }
 
     /**
@@ -717,8 +740,13 @@ public abstract class GSetup {
         textField.draw(graphics);
     }
 
+    /**
+     * Draws a GProgressBar on the screen
+     *
+     * @param progressBar the GProgressBar to be drawn
+     */
     public void drawGProgressBar(GProgressBar progressBar) {
-        progressBar.draw((GSetup) this);
+        progressBar.draw(this);
     }
 
     /**
@@ -757,23 +785,20 @@ public abstract class GSetup {
     /**
      * Adds a GTextField to the setup
      *
-     * @param textField the GTextField
+     * @param textField the GTextField to be added
      */
     public void addGTextField(GTextField textField) {
         gTextFields.add(textField);
     }
 
+    /**
+     * Adds a GTextView to the setup
+     *
+     * @param textView the GTextView to be added
+     */
     public void addGTextView(GTextView textView) {
         panel.add(textView.getTextArea());
         textViews.add(textView);
-    }
-
-    public void mouseClickedFromOutSide() {
-        if (!mouseOnFrame) {
-            for (GTextField textField : gTextFields) {
-                textField.turnOff();
-            }
-        }
     }
 
     /**
