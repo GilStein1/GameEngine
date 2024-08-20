@@ -5,6 +5,7 @@ import gEngine.Arrays.Queue;
 import java.awt.*;
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 public abstract class VirtualGSetup{
     private DatagramSocket udpSocket;
@@ -28,6 +29,8 @@ public abstract class VirtualGSetup{
     private boolean screenWidthValueUpdate;
     private boolean screenHeightValueUpdate;
     private boolean lastKeyValueUpdate;
+    private final ArrayList<Integer> keysPressedUpdate = new ArrayList<>();
+    private final ArrayList<Integer> keysPressed = new ArrayList<>();
     private int port;
     private Queue<String> methods;
     private Queue<String> requests;
@@ -132,6 +135,22 @@ public abstract class VirtualGSetup{
                     String[] vars = temp.split("~");
                     yOnScreen = Integer.parseInt(vars[0].substring(2));
                 }
+                case "ikp|" -> {
+                    String temp = message.substring(message.indexOf("|")+2);
+                    String[] vars = temp.split("~");
+                    boolean isPressed = Boolean.parseBoolean(vars[0].substring(2));
+                    int key = Integer.parseInt(vars[1].substring(3));
+                    if(isPressed) {
+                        if(!keysPressed.contains(key)) {
+                            keysPressed.add(key);
+                        }
+                    }
+                    else {
+                        if(keysPressed.contains(key)) {
+                            keysPressed.remove((Object)key);
+                        }
+                    }
+                }
                 case "fw|" -> {
                     String temp = message.substring(message.indexOf("|")+2);
                     String[] vars = temp.split("~");
@@ -198,6 +217,7 @@ public abstract class VirtualGSetup{
         screenWidthValueUpdate = true;
         screenHeightValueUpdate = true;
         lastKeyValueUpdate = true;
+        keysPressedUpdate.clear();
     }
 
     private void tick() {
@@ -243,6 +263,14 @@ public abstract class VirtualGSetup{
             yOnScreenValueUpdate = false;
         }
         return yOnScreen;
+    }
+
+    public boolean isKeyPressed(int key) {
+        if(!keysPressedUpdate.contains(key)) {
+            requests.insert("ge ~s ~ikp|~id:" + key);
+            keysPressedUpdate.add(key);
+        }
+        return keysPressed.contains(key);
     }
 
     public int getFrameWidth() {

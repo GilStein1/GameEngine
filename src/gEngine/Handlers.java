@@ -28,6 +28,9 @@ public class Handlers {
                 }
             }
             if (e.getID() == KeyEvent.KEY_PRESSED) {
+                if(!setup.getKeysPressedArray().contains(e.getKeyCode())) {
+                    setup.getKeysPressedArray().add(e.getKeyCode());
+                }
                 setup.setLastKeyPressed(e.getKeyCode());
                 if (setup.getKeyPressed() != null) {
                     setup.insertKeyAndActionPair(new KeyAndActionPair(setup.getKeyPressed(), e));
@@ -35,6 +38,7 @@ public class Handlers {
                 setup.setLastCharPressed(e.getKeyChar());
             }
             if (e.getID() == KeyEvent.KEY_RELEASED) {
+                setup.getKeysPressedArray().remove((Object)e.getKeyCode());
                 if (e.getKeyCode() == setup.lastKey()) {
                     setup.setLastKeyPressed(-1);
                 }

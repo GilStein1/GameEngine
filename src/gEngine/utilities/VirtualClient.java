@@ -143,6 +143,11 @@ public class VirtualClient extends GSetup {
                         setFullScreen(true);
                         outputStream.write(("ok\n").getBytes());
                     }
+                    case "ikp|" -> {
+                        int key = Integer.parseInt(parts[2].substring(3));
+                        String response = "ge ~c ~ikp|~a:" + isKeyPressed(key) + "~id:" + key;
+                        outputStream.write((response + "\n").getBytes());
+                    }
                     case "xoc" -> {
                         String response = "ge ~c ~xoc|~x:" + xOnCanvas();
                         outputStream.write((response + "\n").getBytes());

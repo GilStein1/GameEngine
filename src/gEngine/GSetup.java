@@ -45,6 +45,7 @@ public abstract class GSetup {
     private KeyEventSupplier keyTyped;
     private KeyEventSupplier keyPressed;
     private KeyEventSupplier keyReleased;
+    private final ArrayList<Integer> keysPressed = new ArrayList<>();
     private final Queue<KeyAndActionPair> keyEventsPairs;
     private final double[] fpsArr;
     private boolean leftMouseClicked = false;
@@ -350,6 +351,10 @@ public abstract class GSetup {
         continueRun = false;
     }
 
+    ArrayList<Integer> getKeysPressedArray() {
+        return keysPressed;
+    }
+
     void updateSmoothness(gEngine.utilities.Smoothness amount, Graphics2D graphics) {
         switch (amount) {
             case VERY_SMOOTH -> {
@@ -462,6 +467,10 @@ public abstract class GSetup {
 
     public void setLimitedFps(int fps) {
         this.limitedFps = fps;
+    }
+
+    public boolean isKeyPressed(int key) {
+        return keysPressed.contains(key);
     }
 
     public GSetup setExtendedState(int state) {
